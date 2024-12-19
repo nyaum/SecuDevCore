@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\LatestUpdate\**" />
+    <Compile Remove="Views\SoftwareInstallation\**" />
+    <Content Remove="Views\LatestUpdate\**" />
+    <Content Remove="Views\SoftwareInstallation\**" />
+    <EmbeddedResource Remove="Views\LatestUpdate\**" />
+    <EmbeddedResource Remove="Views\SoftwareInstallation\**" />
+    <None Remove="Views\LatestUpdate\**" />
+    <None Remove="Views\SoftwareInstallation\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Helper\SqlHelper.cs" />
+    <Compile Remove="Helper\SqlParamCollection.cs" />
+    <Compile Remove="Models\Common.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CoreDAL" Version="1.0.8" />
+    <PackageReference Include="CryptoManager" Version="1.0.3" />
+    <PackageReference Include="FileIOHelper" Version="1.0.0" />
+    <PackageReference Include="SingletonManager" Version="1.0.0" />
+    <PackageReference Include="X.PagedList" Version="10.5.7" />
+    <PackageReference Include="X.PagedList.EF" Version="10.5.7" />
+    <PackageReference Include="X.PagedList.EntityFramework" Version="10.5.7" />
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
+  </ItemGroup>
+
+</Project>

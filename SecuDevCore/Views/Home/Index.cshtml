@@ -1,0 +1,199 @@
+﻿
+@using SecuDev.Helper;
+@using System.Reflection;
+@{
+    string nowDate = Utility.GetNowDate();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Jquery 3.7.1 -->
+    <script src="~/lib/Jquery/jquery-3.7.1.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="~/lib/Bootstrap/bootstrap.min.css" />
+    <script src="~/lib/Bootstrap/bootstrap.min.js"></script>
+
+    <!-- FontAwsome 6.7 -->
+    <link href="~/lib/FontAwesome/css/fontawesome.min.css" rel="stylesheet" />
+    <link href="~/lib/FontAwesome/css/all.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="~/lib/common.css" rel="stylesheet" />
+
+    <!-- Custom JS -->
+    <script src="~/lib/common.js"></script>
+
+    <script>
+
+        history.replaceState({}, null, location.pathname);
+
+        $(window).on('load', function () {
+
+            if ("@ViewBag.alertType" == "Session") { fnToast("Session", 1) };
+
+        })
+
+        function fnLogin() {
+
+            var UID = $("#UID").val();
+            var Password = $("#Password").val();
+
+            if (UID == "") {
+
+                fnToast("UID", 0);
+
+                $("#UID").focus();
+
+                return;
+            }
+
+            if (Password == "") {
+
+                fnToast("Password", 0);
+
+                $("#Password").focus();
+
+                return;
+            }
+
+            const Param = "UID=" + String(UID) + "&Password=" + String(Password);
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Home/Login",
+                data: Param,
+                success: function (data) {
+
+                    if (data.Result == "Invalid") {
+
+                        fnToast("Invalid", 0);
+
+                        return;
+                    }
+
+                    location.href = "/Home/Main"
+
+                }
+            })
+
+        }
+
+        // alertType
+        // 0 : LoginErr
+        // 1 : SessionExpired
+        function fnToast(type, alertType) {
+
+            var alertTitle = ""
+            var msg = ""
+
+            if (alertType == 0) {
+
+                alertTitle = "로그인 오류";
+
+                switch (type) {
+                    case "Invalid":
+                        msg = "유효하지 않은 사용자 이름, 또는 비밀번호 오류 입니다.";
+                        break;
+                    case "UID":
+                        msg = "아이디를 다시 입력해주세요.";
+                        break;
+                    case "Password":
+                        msg = "비밀번호를 다시 입력해주세요.";
+                        break;
+                };
+
+            }
+            else if (alertType == 1) {
+
+                alertTitle = "오류";
+                msg = "세션이 만료되어 로그아웃 되었습니다.";
+
+            }
+
+            $("#alert_title > b").text(alertTitle);
+            $("#alert_msg > b").text(msg);
+
+            const toast = document.getElementById("alert_toast");
+
+            $("#alert_toast").toast("show");
+
+            toast.addEventListener('hide.bs.toast', () => {
+                $("#alert_toast").addClass("fadeSlow");
+            })
+
+            toast.addEventListener('show.bs.toast', () => {
+                $("#alert_toast").removeClass("fadeSlow");
+            })
+
+        }
+
+    </script>
+
+
+</head>
+<body class="bg-secondary">
+
+    <!-- Toast Alert -->
+    <div class="toast-container position-absolute top-0 start-50 translate-middle-x pt-5">
+        <div id="alert_toast" class="toast w-100 rounded-bottom">
+            <div class="toast-header">
+                <span id="alert_title" class="text-danger">
+                    <i class="fa-solid fa-circle-xmark pe-2"></i><b></b>
+                </span>
+            </div>
+            <div class="toast-body bg-white text-center rounded-bottom">
+                <span id="alert_msg" class=""><b>유효하지 않은 사용자 이름, 또는 비밀번호 오류 입니다.</b></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container h-100">
+        <div class="row align-items-center h-100">
+            <div class="col-10 mx-auto">
+                <div class="jumbotron">
+                    <form id="Loginfrm" action="/Home/Login" method="post">
+                        <div id="Login" class="card container-fluid p-0 w-50 shadow">
+                            <div class="card-header bg-white">
+                                <big><b>로그인</b></big>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <label class="mb-2"><b>아이디</b></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0 ps-3">
+                                            <i class="fa-solid fa-user"></i>
+                                        </span>
+                                        <input type="text" id="UID" class="form-control form-control-lg border-start-0" name="UID" autocomplete="off" ent="fnLogin" />
+                                    </div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="mb-2"><b>비밀번호</b></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0 ps-3">
+                                            <i class="fa-solid fa-lock"></i>
+                                        </span>
+                                        <input type="password" id="Password" class="form-control form-control-lg border-start-0" name="Password" autocomplete="off" ent="fnLogin" />
+                                    </div>
+                                </div>
+
+                                <hr />
+                                <div>
+                                    <input id="confirm" type="button" class="btn btn-primary float-end col-6" ent="fnLogin" onclick="javascript: fnLogin();" value="로그인" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

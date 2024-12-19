@@ -1,0 +1,139 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@using X.PagedList.Mvc;
+@using SingletonManager;
+@using CryptoManager;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Board b = ViewBag.Read;
+}
+
+<script>
+
+    $().ready(function () {
+
+        var content = fnReadContent(`@b.Content`);
+
+        const viewer = toastui.Editor.factory({
+            el: document.querySelector('#Content'),
+            viewer: true,
+            height: '500px',
+            initialValue: content
+        });
+
+        let FileName = `@b.FileName`.split('|');
+        let uniqueFileId = `@b.FilePath`.split('|');
+
+        let FileHtml = '';
+
+        if (FileName[0] != '') {
+
+            for (var i = 0; i < FileName.length; i++) {
+
+                if (i == 0) {
+
+                    FileHtml = '<a class="link-dark" href="/Board/Download?FileName=' + FileName[i] + '&uniqueFileId=' + uniqueFileId[i] + '">' + FileName[i] + '</a>';
+
+                }
+                else {
+
+                    FileHtml = '<a class="link-dark ps-2" href="/Board/Download?FileName=' + FileName[i] + '&uniqueFileId=' + uniqueFileId[i] + '">' + FileName[i] + '</a>';
+
+                }
+
+                $("#fileArea").append(FileHtml);
+
+            }
+        }
+        else {
+            $("#fileArea").text("첨부파일 없음")
+        }
+
+    })
+
+    function fnDelete() {
+
+        if( confirm("삭제하시겠습니까?") ) {
+
+            const Param = "BID=" + "@b.BID";
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Board/Delete",
+                data: Param,
+                success: function (data) {
+
+                    if (data == 1) {
+
+                        location.href = "/Board";
+
+                    }
+                    else {
+
+                        alert("처리중 오류가 발생했습니다")
+
+                    }
+                }
+
+            })
+
+        }
+
+    }
+
+    function fnEdit() {
+
+        location.href = '/Board/Edit?PageType=E&BID=' + @b.BID
+
+    }
+
+</script>
+
+<div>
+
+    <div class="px-2">
+        <div>
+            <span>
+                <text class="badge rounded-pill" style="background-color:@b.Category.BackgroundColor; color:@b.Category.FontColor">@b.Category.CategoryName</text>
+                <big>
+                    <b>@b.Title</b>
+                </big>
+            </span>
+
+            <i id="ellipsis" role="button" class="fa-solid fa-ellipsis float-end" data-bs-toggle="dropdown"></i>
+            <ul class="dropdown-menu" style="--bs-dropdown-link-active-bg: none !important ">
+                <li>
+                    <a class="dropdown-item" href="javascript:fnDelete()"><i class="fa-solid fa-trash-can pe-3"></i>삭제</a>
+                </li>
+                <li><a class="dropdown-item" href="javascript:fnEdit()"><i class="fa-solid fa-pen-to-square pe-3"></i>수정</a></li>
+            </ul>
+
+        </div>
+
+        <div>
+            <small>@b.InsertDate</small>
+            <small class="float-end">@b.Users.UserName</small>
+        </div>
+    </div>
+
+    <div>
+
+        <hr />
+        <div class="px-2">
+            <i class="fa-solid fa-file-arrow-down pe-2"></i>
+            <span id="fileArea">
+                
+            </span>
+        </div>
+    </div>
+
+    <hr />
+
+    <div id="Content" class="border rounded-1 p-4 bg-white">
+        
+    </div>
+
+    <hr />
+
+</div>

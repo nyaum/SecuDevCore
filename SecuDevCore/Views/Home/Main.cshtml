@@ -1,0 +1,141 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@using X.PagedList.Mvc;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nowDate = Utility.GetNowDate();
+
+}
+
+<div class="container-fluid row mb-3">
+
+    <div class="col-12">
+        <div class="card px-0 shadow-sm">
+
+            <div role="button" class="card-header bg-white" href="/LatestUpdate">
+
+                <span class=" d-flex align-items-center justify-content-center fw-bold">
+                    내 프로젝트 목록
+                    <i class="fa-solid fa-chevron-right ms-auto"></i>
+                </span>
+
+            </div>
+
+            <div class="card-body pt-0">
+
+                <table class="table table-hover text-center">
+
+                    <thead>
+
+                        <tr>
+                            <th>프로젝트 명</th>
+                            <th>등록일</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>진행중인 프로젝트 이름</td>
+                            <td>@Utility.DateTimeFormat(nowDate, 1)</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+    </div>
+
+</div>
+
+<div class="container-fluid row">
+    <div class="col-6">
+        <div class="card px-0 shadow-sm">
+
+            <div role="button" class="card-header bg-white" href="/LatestUpdate">
+
+                <span class=" d-flex align-items-center justify-content-center fw-bold">
+                    내 프로젝트 목록
+                    <i class="fa-solid fa-chevron-right ms-auto"></i>
+                </span>
+
+            </div>
+
+            <div class="card-body pt-0">
+
+                <table class="table table-hover text-center">
+
+                    <thead>
+
+                        <tr>
+                            <th>프로젝트 명</th>
+                            <th>등록일</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>진행중인 프로젝트 이름</td>
+                            <td>@Utility.DateTimeFormat(nowDate, 1)</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="col-6">
+        <div class="card px-0 shadow-sm">
+
+            <div role="button" class="card-header bg-white">
+
+                <span class=" d-flex align-items-center justify-content-center fw-bold">
+                    글 목록
+                    <i class="fa-solid fa-chevron-right ms-auto"></i>
+                </span>
+
+            </div>
+
+            <div class="card-body pt-0">
+
+                <table class="table table-hover text-center">
+
+                    <thead>
+
+                        <tr>
+                            <th>제목</th>
+                            <th>등록일</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>게시판 글 제목 입력란</td>
+                            <td>@Utility.DateTimeFormat(nowDate, 1)</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+    </div>
+
+</div>

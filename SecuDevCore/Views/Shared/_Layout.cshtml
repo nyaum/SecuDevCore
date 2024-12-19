@@ -1,0 +1,239 @@
+﻿@using SecuDev.Helper;
+@{
+    string nowDate = Utility.GetNowDate();
+
+    HttpContextAccessor _Ac = new HttpContextAccessor();
+
+    string UserName = _Ac.HttpContext.Session.GetString("UserName");
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="~/favicon.ico" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Jquery 3.7.1 -->
+    <script src="/lib/Jquery/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap 5.3.3 -->
+    <link rel="stylesheet" href="/lib/Bootstrap/bootstrap.min.css" />
+    <script src="~/lib/Bootstrap/bootstrap.min.js"></script>
+
+    <!-- Chart.js 4.4.1 -->
+    <script src="/lib/ChartJS/chart.min.js"></script>
+
+    <!-- Chart.js datalabel (tooltip-data) -->
+    <script src="/lib/ChartJS/chartjs-plugin-datalabels.js"></script>
+
+    <!-- FontAwsome 6.7 -->
+    <link href="/lib/FontAwesome/css/fontawesome.min.css" rel="stylesheet" />
+    <link href="/lib/FontAwesome/css/all.css" rel="stylesheet" />
+
+    <!-- PagedList -->
+    <link href="/lib/PagedList/PagedList.css" rel="stylesheet" type="text/css" />
+
+    <!-- DatePicker -->
+    <script src="/lib/DatePicker/datepicker-full.min.js"></script>
+    <link rel="stylesheet" href="/lib/DatePicker/datepicker.min.css" />
+    <link rel="stylesheet" href="/lib/DatePicker/datepicker-bs5.min.css" />
+    <script src="/lib/DatePicker/custom-datepicker.js"></script>
+
+    <!-- ToastUI-Editor -->
+    <script src="~/lib/ToastEditor/toastui-editor-all.min.js"></script>
+    <link href="~/lib/ToastEditor/toastui-editor.min.css" rel="stylesheet" />
+    <script src="~/lib/ToastEditor/ko-kr.js"></script>
+    @*<script src="https://uicdn.toast.com/editor/latest/i18n/ko-kr.js"></script>*@
+
+    <!-- FilePond -->
+    <script src="~/lib/FilePond/filepond.min.js"></script>
+    <script src="~/lib/FilePond/filepond-plugin-file-validate-size.js"></script>
+    <script src="~/lib/FilePond/filepond.jquery.js"></script>
+    <link rel="stylesheet" href="~/lib/FilePond/filepond.css" />
+
+    <!-- Custom CSS -->
+    <link href="/lib/common.css?@Utility.DateTimeFormat(nowDate, 7)" rel="stylesheet" />
+
+    <!-- Custom JS -->
+    <script src="/lib/common.js?@Utility.DateTimeFormat(nowDate, 7)"></script>
+
+    <script>
+
+    </script>
+
+</head>
+<body>
+
+    <div class="container-fluid min-vh-100 mh-100 p-0 d-flex">
+        <div id="bdSidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-secondary text-white offcanvas-lg offcanvas-start">
+
+            <img role="button" src="~/img/logo2.png" width="250" class="img-fluid" href="/Home/Main" />
+
+            <hr>
+
+            <div class="d-flex card bg-secondary">
+                <div class="card-body">
+                    <span class="text-white">
+                        @UserName
+                        <a href="/" class="text-white float-end"><i class="fa-solid fa-right-from-bracket"></i></a>
+                    </span>
+                </div>
+            </div>
+
+            <hr />
+
+            <ul class="list-group list-group-flush">
+
+                <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" href="/LatestUpdate">
+                    <span class="d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-list-check pe-3"></i>
+                        프로젝트
+                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                    </span>
+                </li>
+
+                <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" href="/Board">
+
+                    <span class="d-flex align-items-center justify-content-center">
+                        <i class="fa-regular fa-comments pe-3"></i>
+                        게시판
+                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                    </span>
+                </li>
+
+            </ul>
+
+            <hr class="mt-auto" />
+
+            @*<div role="button" class="d-flex card bg-secondary" data-bs-toggle="offcanvas" data-bs-target="#alert">
+                    <div class="card-body">
+                        <span class="text-white">
+                            <i class="fa-regular fa-bell pe-3"></i>
+                            알림
+                        </span>
+                    </div>
+                </div>*@
+
+        </div>
+
+        <div class="bg-light flex-fill mh-100 overflow-auto">
+            <div class="p-2 d-lg-none d-flex sticky-top text-white bg-secondary">
+                <a href="#" class="text-white" data-bs-toggle="offcanvas" data-bs-target="#bdSidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </a>
+                <span class="ms-3 fw-bold">SECUIDEA</span>
+                <button class="btn btn-sm btn-secondary ms-auto" data-bs-toggle="offcanvas" data-bs-target="#alarm">
+                    <i class="fa-regular fa-bell px-1"></i>
+                </button>
+            </div>
+            <div class="p-4 mh-100">
+
+                <nav style="--bs-breadcrumb-divider:'>';font-size:14px">
+                    <ol class="breadcrumb">
+                        <li role="button" class="breadcrumb-item" href="/Home/Main">
+                            <i class="fa-solid fa-house"></i>
+                        </li>
+                        <li class="breadcrumb-item">상위 카테고리</li>
+                        <li class="breadcrumb-item">하위 카테고리</li>
+                    </ol>
+                </nav>
+
+                <hr />
+
+                <div class="row">
+                    <div class="col">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Alarm -->
+    <div class="position-absolute bottom-0 end-0 offcanvas-lg translate-middle-x pb-5">
+        <div role="button" class="d-flex card bg-light rounded-5 shadow-sm" data-bs-toggle="offcanvas" data-bs-target="#alarm" style="--bs-border-radius-xxl: 5rem;">
+            <span class="text-secondary p-4">
+                <i class="fa-regular fa-bell px-1"></i>
+            </span>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" id="alarm">
+        <div class="offcanvas-header border-bottom">
+            <h3 class="offcanvas-title">알림</h3>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+
+            <div class="card mb-2">
+                <div class="card-body p-1">
+                    <span class="d-flex align-items-center justify-content-center border-bottom p-2">
+                        게시글 멘션 알림
+                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                    </span>
+
+                    <div class="p-2">
+                        알림 내용
+                    </div>
+
+                    <div>
+                        <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-body p-1">
+                    <span class="d-flex align-items-center justify-content-center border-bottom p-2">
+                        새 프로젝트 등록
+                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                    </span>
+
+
+                    <div class="p-2">
+                        알림 내용
+                    </div>
+
+                    <div>
+                        <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-body p-1">
+                    <span class="d-flex align-items-center justify-content-center border-bottom p-2">
+                        알림 제목
+                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                    </span>
+
+
+                    <div class="p-2">
+                        알림 내용
+                    </div>
+                    <div>
+                        <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    @*<div class="container body-content">
+
+            @RenderBody()
+
+        </div>*@
+
+    @*<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-bottom" style="box-shadow: 0 0 10px rgba(0,0,0,.5) !important; ">
+            <small class="navbar-text text-white p-0 ms-auto me-2">
+                Copyright &copy; @Utility.DateTimeFormat(nowDate, 5) Corporation. All Rights Reserved.
+            </small>
+        </nav>*@
+</body>
+</html>

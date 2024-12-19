@@ -1,0 +1,94 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@using X.PagedList.Mvc;
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<SecuDev.Models.Board>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nowDate = Utility.GetNowDate();
+    //List<Board> list = ViewBag.list;
+
+}
+<script>
+    $().ready(function () {
+        // 카테고리 선택 
+        $(".dropdown-toggle[changeable=true]").next(".dropdown-menu").children().on("click", function () {
+
+            $("#category").text($(this).text())
+            $("#category").attr("data-value", $(this).attr("data-value"))
+
+        });
+    })
+
+
+</script>
+<div>
+    <div class="row">
+
+        <div class="col-7">
+
+            <div class="input-group">
+                <button type="button" class="btn btn-light dropdown-toggle border-secondary" data-bs-toggle="dropdown" changeable="true">
+                    <span id="category" class="px-1" data-value="" name="category">카테고리</span>
+                </button>
+
+                <ul class="dropdown-menu" style="--bs-dropdown-link-active-bg: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity)) !important ">
+                    @{
+                        foreach (var c in Utility.GetCategoryList())
+                        {
+                            <li role="button" data-value="@c.CID">
+                                <a class="dropdown-item">@c.CategoryName</a>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                <input type="text" id="title" class="form-control border-secondary" placeholder="제목" />
+                <input type="text" id="title" class="form-control border-secondary" placeholder="작성자" />
+                <button type="button" class="btn btn-light border-secondary"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+
+        </div>
+
+        <div class="col-5">
+            <button role="button" class="btn btn-light shadow-sm float-end text-primary" href="/Board/Edit">
+                <i class="fa-solid fa-pen me-2"></i>
+                작성
+            </button>
+        </div>
+
+    </div>
+
+    <hr class="mb-0" />
+
+    <table class="table table-hover table-light" style="font-size:15px">
+
+        <tbody>
+
+            @{
+                foreach (var b in Model)
+                {
+
+                    <tr role="button" href="/Board/Read?BID=@b.BID">
+                        <td width="5%" class="align-middle text-center">@b.BID</td>
+                        <td>
+                            <div class="mb-1">
+                                @b.Title
+                            </div>
+                            <span class="badge rounded-pill" style="background-color:@b.Category.BackgroundColor; color:@b.Category.FontColor;">
+                                @b.Category.CategoryName
+                            </span>
+                            <small class="text-secondary">@b.Users.UserName</small>
+                            <small class="text-secondary float-end me-3">@Utility.DateTimeFormat(b.InsertDate, 9)</small>
+                        </td>
+                    </tr>
+
+                }
+            }
+        </tbody>
+
+    </table>
+</div>
+<div>
+    @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page, Model.PageSize }))
+</div>
