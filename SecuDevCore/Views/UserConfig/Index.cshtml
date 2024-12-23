@@ -1,0 +1,61 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@using X.PagedList.Mvc;
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<SecuDev.Models.Users>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nowDate = Utility.GetNowDate();
+}
+<script>
+    $().ready(function () {
+
+    })
+
+</script>
+<div>
+    <button role="button" class="btn btn-light shadow-sm float-end text-primary mb-3" href="/UserConfig/Add">
+        <i class="fa-solid fa-plus me-2"></i>
+        사용자 추가
+    </button>
+    <table class="table table-hover table-light" style="font-size:15px">
+        <tbody>
+            @{
+                foreach (var u in Model)
+                {
+
+                    <tr role="button" href="/UserCofig/Read?UID=@u.UID">
+                        <td>
+                            <div class="mb-1">
+                                <span class="badge bg-secondary">@u.Authority.AuthorityName</span>
+                                <span class="me-4">@u.UserName</span>
+                            </div>
+                            <div>
+                                <small class="text-secondary">
+                                    <span class="me-4">
+                                        <i class="fa-solid fa-plus me-1"></i>
+                                        계정 생성일
+                                    </span>
+                                    @Utility.DateTimeFormat(u.InsertDate, 2)
+                                </small>
+                            </div>
+                            <div>
+                                <small class="text-secondary">
+                                    <span class="me-4">
+                                        <i class="fa-regular fa-clock me-1"></i>
+                                        마지막 로그인
+                                    </span>
+                                    @Utility.DateTimeFormat(u.LastLogin, 9)
+                                </small>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page, Model.PageSize }))
+</div>

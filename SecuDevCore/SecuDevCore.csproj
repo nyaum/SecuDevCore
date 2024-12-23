@@ -7,12 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Upload\Data\**" />
+    <Compile Remove="Upload\File\**" />
     <Compile Remove="Views\LatestUpdate\**" />
     <Compile Remove="Views\SoftwareInstallation\**" />
+    <Content Remove="Upload\Data\**" />
+    <Content Remove="Upload\File\**" />
     <Content Remove="Views\LatestUpdate\**" />
     <Content Remove="Views\SoftwareInstallation\**" />
+    <EmbeddedResource Remove="Upload\Data\**" />
+    <EmbeddedResource Remove="Upload\File\**" />
     <EmbeddedResource Remove="Views\LatestUpdate\**" />
     <EmbeddedResource Remove="Views\SoftwareInstallation\**" />
+    <None Remove="Upload\Data\**" />
+    <None Remove="Upload\File\**" />
     <None Remove="Views\LatestUpdate\**" />
     <None Remove="Views\SoftwareInstallation\**" />
   </ItemGroup>
@@ -32,6 +40,10 @@
     <PackageReference Include="X.PagedList.EF" Version="10.5.7" />
     <PackageReference Include="X.PagedList.EntityFramework" Version="10.5.7" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Upload\" />
   </ItemGroup>
 
 </Project>

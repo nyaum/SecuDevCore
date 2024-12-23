@@ -1,0 +1,58 @@
+﻿@{
+    var ERRCode = ViewBag.ERRCode;
+}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Jquery 3.7.1 -->
+    <script src="/lib/Jquery/jquery-3.7.1.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/lib/Bootstrap/bootstrap.min.css" />
+    <script src="~/lib/Bootstrap/bootstrap.min.js"></script>
+
+    <!-- FontAwsome 6.7 -->
+    <link href="/lib/FontAwesome/css/fontawesome.min.css" rel="stylesheet" />
+    <link href="/lib/FontAwesome/css/all.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="/lib/common.css" rel="stylesheet" />
+
+    <!-- Custom JS -->
+    <script src="/lib/common.js"></script>
+
+    <title>페이지 404 에러</title>
+    
+</head>
+
+<title> 페이지 404 에러 </title>
+
+<body class="bg-secondary">
+    <div class="container h-100">
+        <div class="row align-items-center h-100">
+            <div class="col-10 mx-auto">
+                <div class="jumbotron">
+                    <div class="card container-fluid p-0 w-50 shadow" style="min-width: 300px;">
+
+                        <i class="fa-solid fa-triangle-exclamation ms-auto me-auto" style="font-size:150px;"></i>
+
+                        <span class="px-5 me-auto ms-auto fs-2 fw-bold">404</span>
+
+                        <hr class="mx-4" />
+
+                        <div class="p-3" align="center">
+                            <h4 class="mb-5">페이지를 불러오는중 오류가 발생했습니다.</h4>
+
+                            <button type="button" class="btn btn-light border-secondary" onclick="javascript: history.back()">이전 페이지</button>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+

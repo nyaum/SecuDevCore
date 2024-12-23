@@ -5,6 +5,7 @@
     HttpContextAccessor _Ac = new HttpContextAccessor();
 
     string UserName = _Ac.HttpContext.Session.GetString("UserName");
+    int AuthorityLevel = Int32.Parse(_Ac.HttpContext.Session.GetString("AuthorityLevel"));
 }
 <!DOCTYPE html>
 <html>
@@ -101,6 +102,29 @@
                         <i class="fa-solid fa-chevron-right ms-auto"></i>
                     </span>
                 </li>
+
+                @{
+                    // 관리자 영역
+                    if (AuthorityLevel == 0) {
+                        <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" href="/UserConfig">
+
+                            <span class="d-flex align-items-center justify-content-center">
+                                <i class="fa-solid fa-user-gear pe-3"></i>
+                                사용자 관리
+                                <i class="fa-solid fa-chevron-right ms-auto"></i>
+                            </span>
+                        </li>
+
+                        <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" href="/Config">
+
+                            <span class="d-flex align-items-center justify-content-center">
+                                <i class="fa-solid fa-gear pe-3"></i>
+                                설정
+                                <i class="fa-solid fa-chevron-right ms-auto"></i>
+                            </span>
+                        </li>
+                    }
+                }
 
             </ul>
 

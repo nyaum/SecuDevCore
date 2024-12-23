@@ -65,7 +65,7 @@ namespace SecuDev
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -85,6 +85,7 @@ namespace SecuDev
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            app.UseStatusCodePagesWithRedirects("/Error/{0}"); //point to error page
             app.Run();
 
         }

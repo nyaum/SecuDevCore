@@ -97,20 +97,23 @@ namespace SecuDevCore.Controllers
 
             DataSet ds = result.DataSet;
 
-            Board b = new Board();
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                Board b = new Board();
 
-            b.Users.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
-            b.Category.CategoryName = ds.Tables[0].Rows[0]["CategoryName"].ToString();
-            b.Category.BackgroundColor = ds.Tables[0].Rows[0]["BackgroundColor"].ToString();
-            b.Category.FontColor = ds.Tables[0].Rows[0]["FontColor"].ToString();
-            b.BID = BID;
-            b.Title = ds.Tables[0].Rows[0]["Title"].ToString();
-            b.Content = ds.Tables[0].Rows[0]["Content"].ToString();
-            b.UUID = ds.Tables[0].Rows[0]["UUID"].ToString();
-            b.FileName = ds.Tables[0].Rows[0]["FileName"].ToString();
-            b.InsertDate = ds.Tables[0].Rows[0]["InsertDate"].ToString();
+                b.Users.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+                b.Category.CategoryName = ds.Tables[0].Rows[0]["CategoryName"].ToString();
+                b.Category.BackgroundColor = ds.Tables[0].Rows[0]["BackgroundColor"].ToString();
+                b.Category.FontColor = ds.Tables[0].Rows[0]["FontColor"].ToString();
+                b.BID = BID;
+                b.Title = ds.Tables[0].Rows[0]["Title"].ToString();
+                b.Content = ds.Tables[0].Rows[0]["Content"].ToString();
+                b.UUID = ds.Tables[0].Rows[0]["UUID"].ToString();
+                b.FileName = ds.Tables[0].Rows[0]["FileName"].ToString();
+                b.InsertDate = ds.Tables[0].Rows[0]["InsertDate"].ToString();
 
-            ViewBag.Read = b;
+                ViewBag.Read = b;
+            }
 
             return View();
         }
