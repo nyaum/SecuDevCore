@@ -76,7 +76,7 @@ namespace SecuDevCore.Controllers
                 b.Title = ds.Tables[0].Rows[0]["Title"].ToString();
                 b.Content = ds.Tables[0].Rows[0]["Content"].ToString();
                 b.FileName = ds.Tables[0].Rows[0]["FileName"].ToString();
-                b.FilePath = ds.Tables[0].Rows[0]["FilePath"].ToString();
+                b.UUID = ds.Tables[0].Rows[0]["UUID"].ToString();
 
             }
 
@@ -106,8 +106,8 @@ namespace SecuDevCore.Controllers
             b.BID = BID;
             b.Title = ds.Tables[0].Rows[0]["Title"].ToString();
             b.Content = ds.Tables[0].Rows[0]["Content"].ToString();
+            b.UUID = ds.Tables[0].Rows[0]["UUID"].ToString();
             b.FileName = ds.Tables[0].Rows[0]["FileName"].ToString();
-            b.FilePath = ds.Tables[0].Rows[0]["FilePath"].ToString();
             b.InsertDate = ds.Tables[0].Rows[0]["InsertDate"].ToString();
 
             ViewBag.Read = b;
@@ -116,12 +116,26 @@ namespace SecuDevCore.Controllers
         }
 
         [HttpPost]
-        public int Write(Board b, string[] FilePath)
+        public int Write(Board b, string[] FilePath, string[] DeleteFilePath)
         {
             int Rtn = -1;
 
             string dbFilePath = "";
             string FileName = "";
+
+            // 삭제부터 처리
+            if (DeleteFilePath != null)
+            {
+                for (int i = 0; i < DeleteFilePath.Length; i++)
+                {
+                    dbFilePath = DeleteFilePath[i].Split(',')[0];
+
+                    FileDelete(dbFilePath);
+                }
+            }
+
+            dbFilePath = "";
+            FileName = "";
 
             if (FilePath != null)
             {
@@ -147,7 +161,7 @@ namespace SecuDevCore.Controllers
                 { "UID", HttpContext.Session.GetString("UID") },
                 { "Title", b.Title },
                 { "Content", b.Content },
-                { "FilePath", dbFilePath },
+                { "UUID", dbFilePath },
                 { "FileName", FileName },
                 { "IPAddress", HttpContext.Session.GetString("IPAddress") }
             };
@@ -196,12 +210,12 @@ namespace SecuDevCore.Controllers
 
             string Rtn = "FAIL";
 
-            string today = Utility.DateTimeFormat(Utility.GetNowDate(), 8);
-            string uploadDir = $"{_env.ContentRootPath}/Upload/File/{today}/";
-            string dir = "/" + today + "/";
+            string dir = $"{_env.ContentRootPath}/Upload/File/";
 
             string dbFilePath = "";
             string altFileName = "";
+
+            string uuid = "";
 
             // 경로 확인
             try
@@ -209,7 +223,7 @@ namespace SecuDevCore.Controllers
                 if (file != null)
                 {
                     // 경로 확인
-                    DirectoryInfo di = new DirectoryInfo(uploadDir);
+                    DirectoryInfo di = new DirectoryInfo(dir);
 
                     if (di.Exists == false)
                     {
@@ -220,22 +234,10 @@ namespace SecuDevCore.Controllers
                     {
                         if (formFile.Length > 0)
                         {
+                            var _uuid = Guid.NewGuid().ToString();
                             var fileName = Path.GetFileName(formFile.FileName);
-                            var fileFullPath = Path.Combine(uploadDir + fileName);
-                            var fileDir = Path.Combine(dir + fileName);
-
-                            int filecnt = 1;
-                            string newFileName = string.Empty;
-                            while (new FileInfo(fileFullPath).Exists)
-                            {
-                                var idx = formFile.FileName.LastIndexOf('.');
-                                var tmp = formFile.FileName.Substring(0, idx);
-                                newFileName = tmp + String.Format("({0})", filecnt++) + formFile.FileName.Substring(idx);
-                                fileFullPath = uploadDir + newFileName;
-                                fileDir = dir + newFileName;    // TODO: 여기에서 다시 파일 경로를 조합하고 있음
-                            }
-
-                            //formFile.SaveAs(fileFullPath);
+                            var fileFullPath = Path.Combine(dir + _uuid);
+                            var fileDir = Path.Combine(dir + _uuid);
 
                             using (var stream = new FileStream(fileFullPath, FileMode.Create))
                             {
@@ -248,11 +250,13 @@ namespace SecuDevCore.Controllers
                             {
                                 dbFilePath = crypto.Encrypt(fileDir);   // TODO: += 연산자가 필요 없어 보임
                                 altFileName = fileName;
+                                uuid = _uuid;
                             }
                             else
                             {
                                 dbFilePath += fileDir + "|";
                                 altFileName += fileName + "|";
+                                uuid += _uuid + "|";
                             }
                         }
                     }
@@ -266,7 +270,7 @@ namespace SecuDevCore.Controllers
 
             }
 
-            return Json(new { uniqueFileId = dbFilePath, FileName = altFileName });
+            return Json(new { uniqueFileId = uuid, FileName = altFileName, uuid = uuid });
         }
 
         [HttpPost]
@@ -275,7 +279,7 @@ namespace SecuDevCore.Controllers
 
             string sRtn = "Fail";
 
-            uniqueFileId = $"{_env.ContentRootPath}/Upload/File/{crypto.Decrypt(uniqueFileId)}";
+            uniqueFileId = $"{_env.ContentRootPath}/Upload/File/{uniqueFileId}";
 
             if (System.IO.File.Exists(uniqueFileId))
             {
@@ -289,7 +293,7 @@ namespace SecuDevCore.Controllers
 
         public FileResult Download(string uniqueFileId, string FileName)
         {
-            string FilePath = $"{_env.ContentRootPath}/Upload/File/{crypto.Decrypt(uniqueFileId)}";
+            string FilePath = $"{_env.ContentRootPath}/Upload/File/{uniqueFileId}";
 
             byte[] bytes = System.IO.File.ReadAllBytes(FilePath);
 

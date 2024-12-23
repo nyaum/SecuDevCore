@@ -12,9 +12,8 @@
 <meta charset="UTF-8">
 <script>
 
-    let ChkUnload = true;
-
     let FILELIST = [];
+    let DEL_FILELIST = [];
 
     let editor;
 
@@ -36,49 +35,26 @@
 
         });
 
-
-        // 파일을 올리고 새로고침하거나, 페이지 나갈시에 작동 && 작성 완료 버튼 클릭시 작동 안되게
-        //$(window).on("beforeunload", function () {
-
-        //    if (FILELIST.length > 0 && ChkUnload) {
-
-        //        FILELIST.forEach(function (elem) {
-
-        //            const formData = new FormData();
-
-        //            formData.append("uniqueFileId", elem["uniqueFileId"])
-
-        //            const request = new XMLHttpRequest();
-        //            request.open('POST', '/Board/FileDelete', true);
-
-        //            request.send(formData);
-
-        //        });
-
-        //    }
-
-        //})
-
         if ("@PageType" == "E") {
 
             var FILEPOND_SOURCE = [];
 
             $("#category").attr("data-value", @b.Category.CID)
-            $("#category").text(@b.Category.CategoryName)
-            $("#title").val("@b.Title")
+            $("#category").text("@Html.Raw(b.Category.CategoryName)")
+            $("#title").val("@Html.Raw(b.Title)")
 
-            var FileName = "@b.FileName".split("|")
-            var uniqueFileId = "@b.FilePath".split("|")
+            var FileName = "@Html.Raw(b.FileName)".split("|")
+            var uniqueFileId = "@Html.Raw(b.UUID)".split("|")
 
             FileName.forEach(function (elem, index) {
 
                 var json = {
-                    FileName: FileName[index],
+                    fileName: FileName[index],
                     uniqueFileId: uniqueFileId[index]
                 }
 
                 var filepond_json = {
-                    source: String.format("{\"uniqueFileId\":\"{0}\",\"FileName\":\"{1}\",\"PageType\":\"{1}\"}", uniqueFileId[index], FileName[index], "E"),
+                    source: String.format("{\"uniqueFileId\":\"{0}\",\"fileName\":\"{1}\",\"PageType\":\"{2}\"}", uniqueFileId[index], FileName[index], "E"),
                     options: {
                         type: 'limbo',
                         file: {
@@ -168,25 +144,16 @@
 
                     var parse = JSON.parse(uniqueFileId);
 
-                    const formData = new FormData();
-                    formData.append("uniqueFileId", parse["uniqueFileId"])
+                    DEL_FILELIST.push(parse);
 
-                    const request = new XMLHttpRequest();
-                    request.open('POST', '/Board/FileDelete', true);
+                    console.log(parse);
 
-                    request.send(formData);
+                    var uuid = parse["uuid"];
+                    let idx = FILELIST.findIndex(item => item.uuid === uuid);
 
-                    // JsonArray에 있는 uniqueFileId 찾아서 제거
-                    FILELIST.find(function (element, index) {
-
-                        if (element.uniqueFileId === parse["uniqueFileId"]) {
-
-                            FILELIST.splice(index, 1)
-
-                        }
-
-                        return true;
-                    })
+                    if (idx !== -1) {
+                        FILELIST.splice(idx, 1);
+                    }
 
                     load();
 
@@ -268,9 +235,17 @@
         formData.append("Title", Title);
         formData.append("Content", b64Content);
 
+        // 파일 업로드
         for (var i = 0; i < FILELIST.length; i++) {
 
             formData.append("FilePath[" + i + "]", FILELIST[i]["uniqueFileId"] + "," + FILELIST[i]["fileName"]);
+
+        }
+
+        // 업로드 취소 파일도 컨트롤러에서 처리함
+        for (var i = 0; i < DEL_FILELIST.length; i++) {
+
+            formData.append("DeleteFilePath[" + i + "]", DEL_FILELIST[i]["uniqueFileId"] + "," + DEL_FILELIST[i]["fileName"]);
 
         }
 
@@ -303,8 +278,6 @@
                     alert("정상 등록되었습니다.");
 
                     // 이동할 페이지
-
-                    ChkUnload = false;
 
                     location.href = "/Board/Read?BID=" + rtn;
 
@@ -371,20 +344,18 @@
 
 <!-- File Popup -->
 <div id="file-modal" class="modal fade mt-5">
-    <form action="/" method="post" enctype="multipart/form-data">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span>파일 업로드</span>
-                </div>
-                <div class="modal-body">
-                    <input type="file" id="fileUpload" multiple />
-                </div>
-                <div>
-                    <span id="filePath"></span>
-                    <span id="fileName"></span>
-                </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>파일 업로드</span>
+            </div>
+            <div class="modal-body">
+                <input type="file" id="fileUpload" multiple />
+            </div>
+            <div>
+                <span id="filePath"></span>
+                <span id="fileName"></span>
             </div>
         </div>
-    </form>
+    </div>
 </div>
