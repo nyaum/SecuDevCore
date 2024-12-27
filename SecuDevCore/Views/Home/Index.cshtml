@@ -65,12 +65,11 @@
 
             $.ajax({
                 type: "POST",
-                dataType: "json",
                 url: "/Home/Login",
                 data: Param,
                 success: function (data) {
 
-                    if (data.Result == "Invalid") {
+                    if (data == "Invalid") {
 
                         fnToast("Invalid", 0);
 

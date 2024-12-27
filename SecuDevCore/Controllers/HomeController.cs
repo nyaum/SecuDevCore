@@ -39,13 +39,13 @@ namespace SecuDevCore.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(IFormCollection col)
+        public string Login(IFormCollection col)
         {
 
             // 세션 초기화
             HttpContext.Session.Clear();
 
-            string Result = "";
+            string Rtn = "Invalid";
 
             try
             {
@@ -67,17 +67,18 @@ namespace SecuDevCore.Controllers
                     HttpContext.Session.SetString("AuthorityLevel", ds.Tables[0].Rows[0]["AuthorityLevel"].ToString());
 
                     HttpContext.Session.SetString("IPAddress", Utility.GetIP4Address());
-                    Result = ds.Tables[0].Rows[0]["Result"].ToString();
+
+                    Rtn = ds.Tables[0].Rows[0]["Result"].ToString();
 
                 }
 
             }
             catch (Exception ex)
             {
-                Result = "ERR";
+                Rtn = "ERR";
             }
 
-            return Json(new { Result });
+            return Rtn;
 
         }
 
