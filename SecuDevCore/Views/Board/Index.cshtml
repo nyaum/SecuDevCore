@@ -13,11 +13,34 @@
         // 카테고리 선택 
         $(".dropdown-toggle[changeable=true]").next(".dropdown-menu").children().on("click", function () {
 
-            $("#category").text($(this).text())
-            $("#category").attr("data-value", $(this).attr("data-value"))
+            $("#Category").text($(this).text())
+            $("#Category").attr("data-value", $(this).attr("data-value"))
+            $("#CID").val($(this).attr("data-value"))
 
         });
     })
+
+    // function fnSearch(){
+
+    //     var Type = "S";
+    //     var CID = $("#Category[name=Category]").attr('data-value');
+    //     var Title = $("#Title").val();
+    //     var UserName = $("#UserName").val();
+
+    //     var param = "Type=" + Type + "&CID=" + CID + "&Title=" + Title + "&UserName=" + UserName
+
+    //     $.ajax({
+            
+    //         type:"GET",
+    //         dataType: "string",
+    //         data:param,
+    //         url:"/Board",
+    //         success: function(){
+    //             console.log("!!!!")
+    //         }
+    //     })
+
+    // }
 
 
 </script>
@@ -25,28 +48,28 @@
     <div class="row">
 
         <div class="col-7">
-
-            <div class="input-group">
-                <button type="button" class="btn btn-light dropdown-toggle border-secondary" data-bs-toggle="dropdown" changeable="true">
-                    <span id="category" class="px-1" data-value="" name="category">카테고리</span>
-                </button>
-
-                <ul class="dropdown-menu" style="--bs-dropdown-link-active-bg: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity)) !important ">
-                    @{
-                        foreach (var c in Utility.GetCategoryList())
-                        {
-                            <li role="button" data-value="@c.CID">
-                                <a class="dropdown-item">@c.CategoryName</a>
-                            </li>
+            <form id="frmPage" method="get" action="/Board">
+                <div class="input-group">
+                    <button type="button" class="btn btn-light dropdown-toggle border-secondary" data-bs-toggle="dropdown" changeable="true">
+                        <span id="Category" class="px-1" data-value="" name="category">카테고리</span>
+                    </button>
+                    <ul class="dropdown-menu" style="--bs-dropdown-link-active-bg: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity)) !important ">
+                        @{
+                            foreach (var c in Utility.GetCategoryList())
+                            {
+                                <li role="button" data-value="@c.CID">
+                                    <a class="dropdown-item">@c.CategoryName</a>
+                                </li>
+                            }
                         }
-                    }
-                </ul>
+                    </ul>
 
-                <input type="text" id="title" class="form-control border-secondary" placeholder="제목" />
-                <input type="text" id="title" class="form-control border-secondary" placeholder="작성자" />
-                <button type="button" class="btn btn-light border-secondary"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
-
+                    <input type="text" id="Title" class="form-control border-secondary" name="Title" placeholder="제목" ent="fnSearch()" />
+                    <input type="text" id="UserName" class="form-control border-secondary" name="UserName" placeholder="작성자" ent="fnSearch()" />
+                    <button type="submit" class="btn btn-light border-secondary"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+                <input type="hidden" id="CID" value="0" name="CID" />
+            </form>
         </div>
 
         <div class="col-5">
@@ -89,5 +112,5 @@
     </table>
 </div>
 <div>
-    @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page, Model.PageSize }))
+    @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page, Model.PageSize, ViewBag.CID, ViewBag.Title, ViewBag.UserName }))
 </div>

@@ -11,6 +11,7 @@ using SecuDev.Models;
 using SingletonManager;
 using System.Data;
 using System.Drawing.Printing;
+using System.Security.Cryptography;
 using X.PagedList.Extensions;
 
 namespace SecuDevCore.Controllers
@@ -28,21 +29,33 @@ namespace SecuDevCore.Controllers
             _env = webHostEnvironment;
         }
 
-        public IActionResult Index(int? Page, int PageSize = 10)
+        [HttpGet]
+        public IActionResult Index([FromQuery] Board b, [FromQuery] Users u, [FromQuery] Category c, int? Page, int PageSize = 10)
         {
             int PageNo = Page ?? 1;
 
+            int CID = c.CID;
+            string Title = b.Title ?? "";
+            string UserName = u.UserName ?? "";
+
             List<Board> list = new List<Board>();
 
-            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_BOARD_LIST");
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "CID", CID },
+                { "Title", Title },
+                { "UserName", UserName }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_BOARD_LIST", param);
 
             DataSet ds = result.DataSet;
 
-            foreach (DataRow b in ds.Tables[0].Rows)
+            foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                Board tb = b.ToObject<Board>();
-                Users tu = b.ToObject<Users>();
-                Category tc = b.ToObject<Category>();
+                Board tb = dr.ToObject<Board>();
+                Users tu = dr.ToObject<Users>();
+                Category tc = dr.ToObject<Category>();
 
                 tb.Users = tu;
                 tb.Category = tc;
@@ -51,6 +64,9 @@ namespace SecuDevCore.Controllers
             }
 
             ViewBag.list = list;
+            ViewBag.CID = CID;
+            ViewBag.Title = Title;
+            ViewBag.UserName = UserName;
 
             return View(list.ToPagedList(PageNo, PageSize));
         }
@@ -119,7 +135,7 @@ namespace SecuDevCore.Controllers
         }
 
         [HttpPost]
-        public int Write(Board b, string[] FilePath, string[] DeleteFilePath)
+        public int Write(Board b, int? CID, string[] FilePath, string[] DeleteFilePath)
         {
             int Rtn = -1;
 
@@ -160,7 +176,7 @@ namespace SecuDevCore.Controllers
 
             Dictionary<string, object> param = new Dictionary<string, object>
             {
-                { "CID", b.Category.CID },
+                { "CID", CID },
                 { "UID", HttpContext.Session.GetString("UID") },
                 { "Title", b.Title },
                 { "Content", b.Content },
