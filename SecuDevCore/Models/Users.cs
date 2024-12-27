@@ -13,10 +13,12 @@ namespace SecuDev.Models
         public string UID { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+        public string Email { get; set; }
         public string AuthorityLevel { get; set; }
         public string IPAddress { get; set; }
         public string InsertDate { get; set; }
         public string LastLogin { get; set; }
+        public int Status { get; set; }
         public Authority Authority { get; set; }
         public Users()
         {

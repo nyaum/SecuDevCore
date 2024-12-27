@@ -51,3 +51,7 @@ body {
 .badge {
     margin-right:10px;
 }
+
+.hover:hover {
+    background-color: var(--bs-secondary-bg-subtle);
+}

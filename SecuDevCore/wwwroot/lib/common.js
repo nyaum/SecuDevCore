@@ -3,10 +3,25 @@
     // 엔터키 이벤트 (ent 요소 유무 확인)
     $("input[ent]").keypress(function (e) {
         if (e.keyCode == 13) {
-            eval($(this).attr("ent") + "();");
+
+            // 보안 이슈 eval 대체 함수
+            new Function($(this).attr("ent") + "();")();
             return false;
         }
     });
+
+    // 실시간 input 데이터 검사 (propertychange에 함수 이름 입력)
+    $("input[propertychange]").on("propertychange change paste input", function (e) {
+
+        var fnName = $(this).attr("propertychange");
+
+        if (fnName != "") {
+
+            new Function(fnName + '()')();
+
+        }
+
+    })
 
     // 드랍다운 이벤트 (pgcnt 요소 유무 확인)
     //$("select[pgcnt]").on("change", function () {
@@ -33,6 +48,8 @@
 
     })
 
+
+    // string.format evt
     String.format = function () {
         let args = arguments;
 
@@ -80,4 +97,8 @@ function fnReadContent(str) {
 
     }
 
+}
+
+function fnValidation(e) {
+    e.value = e.value.replace(/[^a-z0-9_]/ig, '')
 }

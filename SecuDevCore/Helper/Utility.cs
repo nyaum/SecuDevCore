@@ -172,6 +172,31 @@ namespace SecuDev.Helper
             return list;
         }
 
+        public static List<Authority> GetAuthorityList()
+        {
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+
+                { "Type", "Authority" }
+
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<Authority> list = new List<Authority>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                list.Add(i.ToObject<Authority>());
+
+            }
+
+            return list;
+        }
+
         /// <summary>
         /// 사용자 아이피 주소
         /// </summary>

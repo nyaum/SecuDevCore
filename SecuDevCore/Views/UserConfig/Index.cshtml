@@ -6,56 +6,431 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     string nowDate = Utility.GetNowDate();
+
+    HttpContextAccessor _Ac = new HttpContextAccessor();
+    int AuthorityLevel = Int32.Parse(_Ac.HttpContext.Session.GetString("AuthorityLevel"));
+    string UID = _Ac.HttpContext.Session.GetString("UID");
+
+    if (AuthorityLevel > 0) {
+        <script>
+            alert("관리자용 페이지 입니다.")
+            location.href = "/Home/Main";
+        </script>
+    }
+
 }
+
+<style>
+    /* 부모 .hover 영역 설정 */
+    .hover {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        overflow: hidden; /* 내부 요소가 부모를 넘지 않도록 설정 */
+    }
+
+    /* .fn-area의 초기 상태: 부모 영역 밖에 위치 */
+    .fn-area {
+        position: absolute;
+        top: 0;
+        left: 100%; /* 처음에 화면 오른쪽 밖으로 위치 */
+        height: 100%; /* 부모의 높이에 맞추어 꽉 차게 설정 */
+        width: 0; /* 처음에는 0으로 설정 */
+        transition: left 0.5s ease, width 0.5s ease; /* 왼쪽으로 슬라이딩하고 width가 늘어나는 애니메이션 */
+        display: flex;
+        flex-direction: column; /* 세로로 배치 */
+        align-items: stretch; /* 가로로 꽉 차도록 설정 */
+        box-sizing: border-box; /* padding을 포함한 크기 계산 */
+    }
+
+        /* fn-area의 상단, 하단 영역 */
+        .fn-area .top, .fn-area .bottom {
+            flex-grow: 1; /* 부모 높이를 꽉 채우도록 설정 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%; /* 양 옆을 꽉 채우도록 설정 */
+            padding: 10px; /* 원하는 padding 설정 */
+        }
+
+    /* .hover에 마우스를 올리면 .fn-area가 슬라이딩하면서 크기가 늘어남 */
+    .hover:hover .fn-area {
+        left: calc(100% - 200px); /* 200px로 이동, 원하는 크기 설정 */
+        width: 200px; /* 슬라이드하면서 크기 늘어남 */
+    }
+</style>
+
 <script>
     $().ready(function () {
+        
+        $(".dropdown-toggle[changeable=true]").next(".dropdown-menu").children().on("click", function () {
+
+            $("#AuthorityName").text($(this).text())
+            $("#AuthorityName").attr("data-value", $(this).attr("data-value"))
+            $("#AuthorityLevel").val($(this).attr("data-value"))
+
+        });
 
     })
 
+    // UID 중복확인
+    function fnCheckUID(){
+        
+        var UID = $("input[name='UID']").val()
+        
+        var Msg = "";
+        var FontClass = "";
+
+        $.ajax({
+            type:"POST",
+            url: "/UserConfig/CheckDuplicate",
+            data: { "UID" : UID },
+            success: function(data){
+
+                if (data == 1){
+                    Msg = "사용 가능한 아이디입니다."
+                    FontClass = "text-success"
+
+                    $("input[name='Duplicate']").attr("checked", true);
+
+                }
+                else if (data == 0) {
+                    Msg = "이미 등록된 아이디입니다."
+                    FontClass = "text-danger"
+
+                    $("input[name='Duplicate']").attr("checked", false);
+
+                }
+                else if (data == -1) {
+                    Msg = "중복 확인 중 오류가 발생했습니다."
+                    FontClass = "text-danger"
+
+                    $("input[name='Duplicate']").attr("checked", false);
+
+                }
+                
+                $("#Duplicate_alert").text(Msg);
+                $("#Duplicate_alert").removeClass("d-none");
+
+                $("#Duplicate_alert").removeClass(function(index, className){
+                    return (className.match(/(^|\s)text-\S+/g) || []).join(' ');
+                });
+
+                $("#Duplicate_alert").addClass(FontClass);
+
+            }
+
+        })
+        
+
+    }
+
+    // 비밀번호 일치 확인
+    function fnMatchPassword() {
+
+        var Password = $("input[name='Password']").val()
+        var RePassword = $("input[name='re-Password']").val()
+
+        var Msg = "";
+        var FontClass = "";
+
+        if (Password != "" && RePassword != "") {
+
+            if (Password == RePassword) {
+                Msg = "비밀번호가 일치합니다."
+                FontClass = "text-success"
+                
+                $("input[name='Match']").attr("checked", true);
+            }
+            else {
+                Msg = "비밀번호가 일치하지 않습니다."
+                FontClass = "text-danger"
+
+                $("input[name='Match']").attr("checked", false);
+            }
+
+            $("#Password_alert").text(Msg);
+            $("#Password_alert").removeClass("d-none");
+
+            $("#Password_alert").removeClass(function(index, className){
+                return (className.match(/(^|\s)text-\S+/g) || []).join(' ');
+            });
+
+            $("#Password_alert").addClass(FontClass);
+
+        }
+        else {
+            $("#Password_alert").addClass("d-none");
+        }
+
+    }
+
+    // 사용자 등록 함수
+    function fnConfirm() {
+
+        const UserName = $("input[name='UserName']").val();
+        const UID = $("input[name='UID']").val();
+        const Password = $("input[name='Password']").val();
+        const Email = $("input[name='Email']").val();
+
+        const Duplicate = $("input[name='Duplicate']").is(":checked");
+        const PasswordMatch = $("input[name='Match']").is(":checked");
+
+        const AuthorityLevel = $("#AuthorityName").attr("data-value");
+
+        if (UserName == "") {
+
+            return;
+        }
+
+        if (UID == "") {
+
+            return;
+        }
+
+        if (Password == "") {
+
+            return
+        }
+
+        if (Duplicate && PasswordMatch) {
+
+            const param = "UserName=" + UserName +
+                          "&UID=" + UID +
+                          "&Password=" + Password +
+                          "&Email=" + Email +
+                          "&AuthorityLevel=" + AuthorityLevel;
+
+            $.ajax({
+                type:"POST",
+                url:"/UserConfig/Write",
+                data:param,
+                success:function(data){
+
+                    if (data == 0) {
+                        alert ("입력값을 다시 확인해주세요.")
+
+                        return;
+                    }
+
+                    if (data == -1) {
+                        alert ("등록 중 오류가 발생했습니다.")
+
+                        return;
+                    }
+
+                    if (data == 1 ) {
+                        
+                        alert ("정상 등록되었습니다.")
+
+                        location.href = "/UserConfig"
+
+                    }
+
+                }
+            })
+
+        }
+    }
+
+    function fnChangeStatus(UID, Type){
+    
+        if (Type == "D"){
+
+            if (UID == "@UID")
+            {
+
+                alert("현재 접속중인 계정은 삭제할수 없습니다.")
+
+                return;
+            }
+
+        }
+
+        $.ajax({
+            type:"POST",
+            url: "/UserConfig/Change",
+            data: { "UID" : UID, "Type" : Type },
+            success: function(data){
+                
+                if (data == 1) {
+
+                    alert("계정 " + UID + " 가 정상 처리되었습니다.")
+
+                    location.href = "/UserConfig";
+                }
+
+
+                if (data == 0) {
+                    alert ("존재하지 않는 계정이거나, 이미 처리 된 계정입니다.")
+
+                    return
+                }
+
+                if (data == -1) {
+                    alert ("처리 중 오류가 발생했습니다.")
+
+                    return
+                }
+
+            }
+        
+        })
+
+    }
 </script>
 <div>
-    <button role="button" class="btn btn-light shadow-sm float-end text-primary mb-3" href="/UserConfig/Add">
-        <i class="fa-solid fa-plus me-2"></i>
-        사용자 추가
-    </button>
-    <table class="table table-hover table-light" style="font-size:15px">
-        <tbody>
-            @{
-                foreach (var u in Model)
-                {
+    <div class="col pb-3">
+        <button class="btn btn-light shadow-sm text-primary" data-bs-toggle="modal" data-bs-target="#user-manage">
+            <i class="fa-solid fa-plus me-2"></i>
+            사용자 추가
+        </button>
+    </div>
 
-                    <tr role="button" href="/UserCofig/Read?UID=@u.UID">
-                        <td>
-                            <div class="mb-1">
-                                <span class="badge bg-secondary">@u.Authority.AuthorityName</span>
-                                <span class="me-4">@u.UserName</span>
+
+    @{
+        foreach (var u in Model)
+        {
+            <div class="hover d-flex">
+                <div class="border border-end-0 border-start-0 p-3 flex-fill" role="button">
+                    <table class="table-borderless table-light" style="font-size:15px">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="mb-1">
+                                        @{
+                                            if(u.Status == 1)
+                                            {
+                                                <span class="badge bg-danger">비활성 계정</span>
+                                            }
+
+                                        }
+                                        <span class="badge bg-secondary">@u.Authority.AuthorityName</span>
+                                        <span class="me-4">@u.UserName</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <small class="text-secondary">
+                                        <span class="me-4">
+                                            <i class="fa-solid fa-plus me-1"></i>
+                                            계정 생성일
+                                        </span>
+                                    </small>
+                                </td>
+                                <td>
+                                    <small class="text-secondary">
+                                        @Utility.DateTimeFormat(u.InsertDate, 2)
+                                    </small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <small class="text-secondary">
+                                        <span class="me-4">
+                                            <i class="fa-regular fa-clock me-1"></i>
+                                            마지막 로그인
+                                        </span>
+                                    </small>
+                                </td>
+                                <td>
+                                    <small class="text-secondary">
+                                        @Utility.DateTimeFormat(u.LastLogin, 9)
+                                    </small>
+                                </td>
+                            <tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="fn-area">
+                    @{
+                        if(u.Status == 0) {
+                            <div role="button" onclick="javascript:fnChangeStatus('@u.UID', 'D')" class="top bg-secondary border-bottom border-white">
+                                <i class="fa-solid fa-user-minus text-light fs-4"></i>
                             </div>
-                            <div>
-                                <small class="text-secondary">
-                                    <span class="me-4">
-                                        <i class="fa-solid fa-plus me-1"></i>
-                                        계정 생성일
-                                    </span>
-                                    @Utility.DateTimeFormat(u.InsertDate, 2)
-                                </small>
+                        }
+                        else
+                        {
+                            <div role="button" onclick="javascript:fnChangeStatus('@u.UID', 'A')" class="top bg-secondary border-bottom border-white">
+                                <i class="fa-solid fa-user-plus text-light fs-4"></i>
                             </div>
-                            <div>
-                                <small class="text-secondary">
-                                    <span class="me-4">
-                                        <i class="fa-regular fa-clock me-1"></i>
-                                        마지막 로그인
-                                    </span>
-                                    @Utility.DateTimeFormat(u.LastLogin, 9)
-                                </small>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
+                        }
+                    }
+
+                    <div role="button" onclick="javascript:fnEdit('@u.UID')" class="bottom bg-secondary">
+                        <i class="fa-solid fa-cog text-light fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        }
+    }
 </div>
 
 <div>
     @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page, Model.PageSize }))
+</div>
+
+
+<div id="user-manage" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <big class="fw-bold">사용자 추가</big>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control mb-3 border-secondary" name="UserName" placeholder="사용자 이름" />
+
+                <hr />
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-secondary" name="UID" placeholder="아이디" oninput="fnValidation(this)" />
+                        <button type="button" class="btn btn-light border-secondary" onclick="javascript:fnCheckUID()">중복확인</button>
+                    </div>
+                    <span id="Duplicate_alert" class="ms-1 d-none"></span>
+                    <input type="checkbox" name="Duplicate" class="d-none" />
+                </div>
+
+                <div class="mb-3">
+                    <input type="password" class="form-control mb-3 border-secondary" name="Password" placeholder="비밀번호" propertychange="fnMatchPassword" />
+
+                    <input type="password" class="form-control border-secondary" name="re-Password" placeholder="비밀번호 다시 입력" propertychange="fnMatchPassword" />
+                    <span id="Password_alert" class="ms-1 d-none"></span>
+                    <input type="checkbox" name="Match" class="d-none" />
+                </div>
+
+                <hr />
+
+                <input type="text" class="form-control mb-3 border-secondary" name="Email" placeholder="이메일" />
+
+                <hr />
+
+                <button type="button" class="btn btn-light dropdown-toggle border-secondary" data-bs-toggle="dropdown" changeable="true">
+                    <span id="AuthorityName" class="px-1" data-value="" name="AuthorityName">사용자 레벨</span>
+                </button>
+                <ul class="dropdown-menu" style="--bs-dropdown-link-active-bg: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity)) !important ">
+                    @{
+                        foreach (var u in Utility.GetAuthorityList())
+                        {
+                            <li role="button" data-value="@u.AuthorityLevel">
+                                <a class="dropdown-item">@u.AuthorityName</a>
+                            </li>
+                        }
+                    }
+                </ul>
+                <input type="hidden" id="AuthorityLevel" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light border-secondary" onclick="javascript:fnConfirm();">완료</button>
+            </div>
+        </div>
+    </div>
 </div>
