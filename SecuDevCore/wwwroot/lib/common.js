@@ -1,6 +1,6 @@
 ﻿$().ready(function () {
 
-    // autocomplete : off
+    // autocomplete - off
     $("input").attr("autocomplete", "off");
    
     // 엔터키 이벤트 (ent 요소 유무 확인)
