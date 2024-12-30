@@ -1,0 +1,127 @@
+﻿
+@using SecuDev.Helper;
+@{
+    //string nowDate = Utility.GetNowDate();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Jquery 3.7.1 -->
+    <script src="/lib/Jquery/jquery-3.7.1.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/lib/Bootstrap/bootstrap.min.css" />
+    <script src="~/lib/Bootstrap/bootstrap.min.js"></script>
+
+    <!-- FontAwsome 6.7 -->
+    <link href="/lib/FontAwesome/css/fontawesome.min.css" rel="stylesheet" />
+    <link href="/lib/FontAwesome/css/all.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="/lib/common.css" rel="stylesheet" />
+
+    <!-- Custom JS -->
+    <script src="/lib/common.js"></script>
+
+    <script>
+
+        $().ready(function () {
+
+            $("#confirm").on("click", function () {
+                var Param = "DBHost=" + $("#DBHost").val() + "&User=" + $("#User").val() + "&Password=" + $("#Password").val() + "&DBName=" + $("#DBName").val() + "&Port=" + $("#Port").val();
+                $.ajax({
+                    type: "POST",
+                    dataType: "text",
+                    url: "/SetUp/Conn",
+                    data: Param,
+                    success: function (data) {
+
+                        $.ajax({
+                            type: "POST",
+                            dataType: "text",
+                            url: "/SetUp/FileCreate",
+                            data: Param,
+                            success: function (data) {
+
+                                if (data == 'OK') {
+
+                                    alert("DB 연결이 정상 처리되었습니다.");
+
+                                    location.href = '/';
+
+                                }
+                                else {
+
+                                    alert("오류가 발생했습니다.")
+
+                                }
+                            }
+                        });
+                    }
+                });
+            })
+
+        })
+
+    </script>
+
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top shadow">
+        <ul class="navbar-nav">
+            <li class="nav-item text-light ms-5 active">
+                데이터베이스 설정
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container body-content">
+
+        <table id="DBInf" class="table table-bordered w-75 text-center container-fluid shadow-sm">
+            <tr>
+                <th class="bg-light">
+                    <label>주소</label>
+                </th>
+                <td><input type="text" class="form-control" id="DBHost" value="127.0.0.1" /></td>
+            </tr>
+            <tr>
+                <th class="bg-light">
+                    <label>포트</label>
+                </th>
+                <td><input type="text" class="form-control" id="Port" value="1433" readonly /></td>
+            </tr>
+            <tr>
+                <th class="bg-light">
+                    <label>DB 이름</label>
+                </th>
+                <td><input type="text" class="form-control" id="DBName" value="SECUDEV" /></td>
+            </tr>
+            <tr>
+                <th class="bg-light">
+                    <label>아이디</label>
+                </th>
+                <td><input type="text" class="form-control" id="User" value="sa" /></td>
+            </tr>
+            <tr>
+                <th class="bg-light">
+                    <label>비밀번호</label>
+                </th>
+                <td><input type="password" class="form-control" id="Password" value="s1access!" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button id="confirm" type="button" class="btn btn-info float-right col-2">저장</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+
+</body>
+</html>

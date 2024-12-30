@@ -1,0 +1,53 @@
+﻿/* Custom CSS */
+
+body {
+    height: 100vh;
+    font-family: "Noto Sans KR", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+#DBInf {
+    margin-top:10rem;
+}
+
+    #DBInf th {
+        vertical-align:bottom;
+    }
+
+#Login {
+    min-width:300px;
+}
+
+.fadeSlow {
+    transition: opacity 1s ease-out !important;
+}
+
+.pagination > li > a {
+    color:grey;
+}
+
+.pagination > .active > a:hover {
+    background-color: grey;
+    border-color: grey;
+}
+
+.pagination > .active > a {
+    background-color: lightgrey;
+    border-color:lightgrey;
+}
+
+.card table tr td {
+    vertical-align: middle;
+}
+
+/*.table tr th {
+
+    height:3.5rem;
+
+}*/
+
+.badge {
+    margin-right:10px;
+}

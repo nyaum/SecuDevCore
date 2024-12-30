@@ -1,0 +1,389 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@using PagedList.Mvc;
+<!--@@using SecuDEV.Manager;-->
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //string nowDate = Utility.GetNowDate();
+    var PageType = ViewBag.PageType;
+    Board b = ViewBag.Board;
+
+}
+<script>
+
+    let ChkUnload = true;
+
+    let FILELIST = [];
+
+    let editor;
+
+    let content = fnReadContent(`@b.Content`);
+
+    $().ready(function () {
+
+        // Set plugins && opt
+        fnCreateFilePond();
+
+        // 에디터 생성
+        fnCreateEditor();
+
+        // 카테고리 선택
+        $(".dropdown-toggle[changeable=true]").next(".dropdown-menu").children().on("click", function () {
+
+            $("#category").text($(this).text())
+            $("#category").attr("data-value", $(this).attr("data-value"))
+
+        });
+
+
+        // 파일을 올리고 새로고침하거나, 페이지 나갈시에 작동 && 작성 완료 버튼 클릭시 작동 안되게
+        //$(window).on("beforeunload", function () {
+
+        //    if (FILELIST.length > 0 && ChkUnload) {
+
+        //        FILELIST.forEach(function (elem) {
+
+        //            const formData = new FormData();
+
+        //            formData.append("uniqueFileId", elem["uniqueFileId"])
+
+        //            const request = new XMLHttpRequest();
+        //            request.open('POST', '/Board/FileDelete', true);
+
+        //            request.send(formData);
+
+        //        });
+
+        //    }
+
+        //})
+
+        if ("@PageType" == "E") {
+
+            var FILEPOND_SOURCE = [];
+
+            $("#category").attr("data-value", @b.Category.CID)
+            $("#category").text("@b.Category.CategoryName")
+            $("#title").val("@b.Title")
+
+            var FileName = "@b.FileName".split("|")
+            var uniqueFileId = "@b.FilePath".split("|")
+
+            FileName.forEach(function (elem, index) {
+
+                var json = {
+                    FileName: FileName[index],
+                    uniqueFileId: uniqueFileId[index]
+                }
+
+                var filepond_json = {
+                    source: String.format("{\"uniqueFileId\":\"{0}\",\"FileName\":\"{1}\",\"PageType\":\"{1}\"}", uniqueFileId[index], FileName[index], "E"),
+                    options: {
+                        type: 'limbo',
+                        file: {
+                            name: FileName[index]
+                        }
+                    }
+                }
+
+                FILELIST.push(json);
+                FILEPOND_SOURCE.push(filepond_json)
+
+            })
+
+            file = FILEPOND_SOURCE;
+
+            fnCreateFilePond(file);
+
+        }
+
+    })
+
+    function fnCreateFilePond(file) {
+
+        FilePond.registerPlugin(FilePondPluginFileValidateSize);
+
+        // Turn input element into a pond
+        $('#fileUpload').filepond();
+
+        var opt = {
+            allowMultiple: true,
+            maxFileSize: '50MB',
+            labelMaxFileSizeExceeded: '파일 사이즈 오류',
+            labelMaxFileSize: '최대 {filesize} 까지 업로드 가능합니다',
+            labelIdle: '파일을 드래그 앤 드랍하거나, <span class="filepond--label-action"> 폴더에서 찾기 </span>',
+            labelFileProcessingComplete: '업로드 완료',
+            labelFileProcessingAborted: '업로드 취소',
+            labelFileProcessing: '처리중...',
+            labelFileProcessingError: '오류가 발생했습니다',
+            labelFileProcessingRevertError: '오류가 발생했습니다',
+            files: file,
+            server: {
+                process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+
+                    const formData = new FormData();
+
+                    formData.append("fieldName", fieldName);
+                    formData.append("file", file);
+                    formData.append("fileName", file.name);
+
+                    const request = new XMLHttpRequest();
+                    request.open('POST', '/Board/FileUpload', true);
+
+                    request.upload.onprogress = (e) => {
+                        progress(e.lengthComputable, e.loaded, e.total);
+                    };
+
+                    request.onload = function () {
+                        if (request.status >= 200 && request.status < 300) {
+
+                            load(request.responseText);
+
+
+                            // 인코딩된 파일 정보 보내기
+                            //FILELIST.push(request.responseText)
+                            FILELIST.push(JSON.parse(request.responseText));
+
+                        } else {
+
+                            error('error! > ' + request.status);
+
+                        }
+                    };
+
+                    request.send(formData);
+
+                    return {
+                        abort: () => {
+
+                            request.abort();
+
+                            abort();
+
+                        },
+                    };
+                },
+                revert: (uniqueFileId, load, error) => {
+
+                    var parse = JSON.parse(uniqueFileId);
+
+                    const formData = new FormData();
+                    formData.append("uniqueFileId", parse["uniqueFileId"])
+
+                    const request = new XMLHttpRequest();
+                    request.open('POST', '/Board/FileDelete', true);
+
+                    request.send(formData);
+
+                    // JsonArray에 있는 uniqueFileId 찾아서 제거
+                    FILELIST.find(function (element, index) {
+
+                        if (element.uniqueFileId === parse["uniqueFileId"]) {
+
+                            FILELIST.splice(index, 1)
+
+                        }
+
+                        return true;
+                    })
+
+                    load();
+
+                },
+            },
+        }
+
+        $('#fileUpload').filepond(opt)
+
+    }
+
+    // 에디터 생성
+    function fnCreateEditor(PageType) {
+
+        // 에디터 업로드 버튼 생성
+        function btnUpload() {
+
+            const button = document.createElement('button');
+
+            button.className = 'toastui-editor-toolbar-icons';
+            button.id = 'upload'
+            button.style.backgroundImage = 'none';
+            button.style.margin = '0';
+            button.style.color = 'dimgrey';
+            button.style.fontSize = '16px';
+            button.innerHTML = '<i class="fa-solid fa-arrow-up-from-bracket"></i>';
+            button.addEventListener('click', () => {
+                $("#file-modal").modal('show');
+            });
+
+            return button;
+
+        }
+
+        editor = new toastui.Editor({
+            el: document.querySelector('#content'), // 에디터를 적용할 요소 (컨테이너)
+            height: '100%',                        // 에디터 영역의 높이 값 (OOOpx || auto)
+            initialEditType: 'wysiwyg',             // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+            previewStyle: 'vertical',                // 마크다운 프리뷰 스타일 (tab || vertical)
+            language: 'ko',                          // 언어 설정
+            hideModeSwitch: true,
+            initialValue: content,                 // 최초로 보여줄 에디터 기본 내용
+            toolbarItems: [
+                ['heading', 'bold', 'italic', 'strike'],
+                ['hr', 'quote'],
+                ['ul', 'ol', 'task', 'indent', 'outdent'],
+                ['table', 'image', 'link',
+                    {
+                        el: btnUpload(),
+                        tooltip: '업로드'
+                    }
+                ],
+            ]
+        });
+
+    }
+
+
+
+    // 글 작성
+    function fnSubmit() {
+
+
+        var CID = "";
+        var Title = "";
+        var Content = "";
+        var Markdown = "";
+
+        CID = $("#category[name=category]").attr('data-value');
+        Title = $("#title").val();
+        Content = editor.getHTML();
+        Markdown = editor.getMarkdown();
+
+        const b64Content = Content;
+
+        const formData = new FormData();
+
+        formData.append("CID", CID);
+        formData.append("Title", Title);
+        formData.append("Content", b64Content);
+
+        for (var i = 0; i < FILELIST.length; i++) {
+
+            formData.append("FilePath[" + i + "]", FILELIST[i]["uniqueFileId"] + "," + FILELIST[i]["FileName"]);
+
+        }
+
+        if (CID == "") {
+            alert("카테고리가 선택되지 않았습니다.")
+            return;
+        }
+
+        if (Title == "") {
+            alert("제목을 입력해주세요.")
+            return;
+        }
+
+        if (Content == "") {
+            alert("글 내용을 입력해주세요.")
+            return;
+        }
+
+
+        $.ajax({
+            type: "POST",
+            contentType: false,
+            processData: false,
+            url: "/Board/Write",
+            data: formData,
+            success: function (rtn) {
+
+                if (rtn != -1) {
+
+                    alert("정상 등록되었습니다.");
+
+                    // 이동할 페이지
+
+                    ChkUnload = false;
+
+                    location.href = "/Board/Read?BID=" + rtn;
+
+                }
+                else if (rtn == -1) {
+
+                    alert("글 작성중 DB 오류가 발생했습니다.")
+
+                    return
+                }
+
+            }
+        })
+
+    }
+
+
+</script>
+
+
+<div style="height:60vh;">
+
+    <div class="input-group">
+        <button type="button" class="btn btn-light dropdown-toggle border-secondary" data-bs-toggle="dropdown" changeable="true">
+            <span id="category" class="px-2" data-value="" name="category">카테고리</span>
+        </button>
+
+        <ul class="dropdown-menu" style="--bs-dropdown-link-active-bg: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity)) !important ">
+            @{
+                foreach (var c in Utility.GetCategoryList())
+                {
+                    <li role="button" data-value="@c.CID">
+                        <a class="dropdown-item">@c.CategoryName</a>
+                    </li>
+                }
+            }
+        </ul>
+
+        <input type="text" id="title" class="form-control border-secondary" />
+    </div>
+
+    <hr />
+
+    <div id="content"></div>
+
+    <hr />
+
+    <div class="d-flex">
+        <div class="input-group w-50">
+            <input type="text" class="form-control border-secondary" placeholder="알림을 보낼 사용자 추가" value="" readonly />
+            <button type="button" class="btn btn-light border-secondary">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+        <div class="ms-auto">
+            <button type="button" class="btn btn-light shadow-sm text-primary" onclick="javascript: fnSubmit();">
+                <i class="fa-solid fa-check me-2"></i>
+                작성
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- File Popup -->
+<div id="file-modal" class="modal fade mt-5">
+    <form action="/" method="post" enctype="multipart/form-data">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>파일 업로드</span>
+                </div>
+                <div class="modal-body">
+                    <input type="file" id="fileUpload" multiple />
+                </div>
+                <div>
+                    <span id="filePath"></span>
+                    <span id="fileName"></span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

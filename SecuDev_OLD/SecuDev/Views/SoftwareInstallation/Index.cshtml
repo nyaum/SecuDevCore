@@ -1,0 +1,143 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@using PagedList.Mvc;
+@model PagedList.IPagedList<SecuDev.Models.Location>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nowDate = Utility.GetNowDate();
+
+}
+
+<script>
+
+    $().ready(function () {
+
+        const elem = document.getElementById('InstallDate');
+
+        const datepicker = new DateRangePicker(elem);
+
+        datepicker.setOptions({language:"ko"})
+
+        datepicker.setDates('@ViewBag.InstallSDate', '@ViewBag.InstallEDate');
+
+        $("select[name='LocationID']").val(@ViewBag.LocationID).prop('selected', true);
+        $("select[name='SoftwareID']").val(@ViewBag.SoftwareID).prop('selected', true);
+
+        $("input[name='CorpsName']").val("@ViewBag.CorpsName");
+        $("input[name='GateName']").val("@ViewBag.GateName");
+
+
+    })
+
+</script>
+
+<div>
+    <div class="d-flex pb-2">
+        <big><b>해군 출입통제체계 업데이트 작업이력 조회</b></big>
+        <button class="btn btn-sm btn-primary ms-auto">신규작업 등록</button>
+    </div>
+    <form id="frmPage" method="get" action="/SoftwareInstallation">
+        <div class="d-flex pb-2">
+            <div class="col-4 pe-4">
+                <label class="pb-2">체계서버 위치</label>
+                <select class="form-select form-select-sm" name="LocationID">
+                    <option value="0">전체</option>
+                    @{
+                        foreach (var l in Utility.GetLocationList())
+                        {
+                            <option value="@l.LocationID">@l.LocationName</option>
+                        }
+
+                    }
+                </select>
+            </div>
+            <div class="col-4 pe-4">
+                <label class="pb-2">작업 부대</label>
+                <input type="text" id="" class="form-control form-control-sm" name="CorpsName" />
+            </div>
+            <div class="col-4">
+                <label class="pb-2">영문</label>
+                <input type="text" id="" class="form-control form-control-sm" name="GateName" />
+            </div>
+        </div>
+
+        <div class="d-flex pb-2">
+            <div class="col-4 pe-4">
+                <label class="pb-2">작업 S/W</label>
+                <select class="form-select form-select-sm" name="SoftwareID">
+                    <option value="0">전체</option>
+                    @{
+                        foreach (var s in Utility.GetSoftwareList())
+                        {
+                            <option value="@s.SoftwareID">@s.SoftwareName</option>
+                        }
+
+                    }
+                </select>
+            </div>
+            <div class="col-4 pe-3">
+                <label class="pb-2">작업일자</label>
+                <div id="InstallDate" class="input-group input-group-sm">
+                    <input type="text" id="InstallSDate" class="form-control form-control-sm border-end-0 text-center" name="InstallSDate" autocomplete="off" />
+                    <span class="input-group-text border-start-0 border-end-0 bg-white fw-bold">~</span>
+                    <input type="text" id="InstallEDate" class="form-control form-control-sm border-start-0 rounded-end-2 text-center" name="InstallEDate" autocomplete="off" />
+                </div>
+            </div>
+            <div class="col-4 d-flex">
+                <button type="submit" class="btn btn-sm btn-primary mt-auto ms-auto" name="search" value="true">이력 조회</button>
+            </div>
+        </div>
+        <div hidden>
+            <input type="text" id="frmPage" name="Page" value="@Model.PageNumber" hidden readonly />
+            <input type="text" id="frmPageSize" name="PageSize" value="@Model.PageSize" hidden readonly />
+        </div>
+    </form>
+
+    <div class="">
+
+        <div class="d-flex pb-2">
+            <mark class="ms-auto"><b>조회된 정보는 총 @ViewBag.Count 건 입니다</b></mark>
+        </div>
+
+        <table class="table table-sm table-hover border-top border-bottom shadow-sm text-center align-middle mb-0">
+            <thead>
+                <tr class="align-middle">
+                    <th>체계서버 위치</th>
+                    <th>작업 부대</th>
+                    <th>영문</th>
+                    <th>작업일</th>
+                    <th>작업목적</th>
+                    <th>작업 S/W</th>
+                    <th>버전정보</th>
+                    <th>수정</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var l in Model)
+                    {
+                        <tr>
+                            <td>@l.LocationName</td>
+                            <td>@l.CorpsName</td>
+                            <td>@l.GateName</td>
+                            <td>@l.InstallationDate</td>
+                            <td>@l.InstallationType</td>
+                            <td>@l.SoftwareName</td>
+                            <td>@l.Version</td>
+                            <td>
+                                <button type="button" class="btn btn-link text-dark" onclick="javascript: fnDetails(@l.InstallationID)">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <div class="pt-3">
+            @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page, Model.PageSize, ViewBag.InstallSDate, ViewBag.InstallEDate,
+                                                                                                ViewBag.LocationID, ViewBag.SoftwareID, 
+                                                                                                ViewBag.CorpsName, ViewBag.GateName }))
+        </div>
+    </div>
+</div>

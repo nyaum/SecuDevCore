@@ -1,0 +1,233 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@using PagedList.Mvc;
+@model PagedList.IPagedList<SecuDev.Models.Location>
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string nowDate = Utility.GetNowDate();
+
+}
+
+<script>
+
+    $().ready(function () {
+
+        $("#PageSize").val("@Model.PageSize").prop("selected", true);
+
+    })
+    
+    function fnDetails(installationID) {
+
+        var Param = "InstallationID=" + installationID;
+
+        $(".LocationName").text("")
+        $(".CorpsName").text("")
+        $(".GateName").text("")
+        $(".InstallationDate").text("")
+        $(".InstallationType").text("")
+        $(".SoftwareName").text("")
+        $(".Version").text("")
+        $(".Notes").text("")
+
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/LatestUpdate/GetUpdatedHistory",
+            data: Param,
+            success: function (data) {
+
+                data = data.Result;
+
+                $(".LocationName").text(data["LocationName"])
+                $(".CorpsName").text(data["CorpsName"])
+                $(".GateName").text(data["GateName"])
+                $(".InstallationDate").text(data["InstallationDate"])
+                $(".InstallationType").text(data["InstallationType"])
+                $(".SoftwareName").text(data["SoftwareName"])
+                $(".Version").text(data["Version"])
+                $(".Notes").text(data["Notes"])
+
+                $("#Detail").modal('show');
+            }
+        })
+
+    }
+
+
+
+</script>
+
+<div class="pb-2">
+    <big><b>해군 출입통제체계 부대별 최신업데이트 현황</b></big>
+</div>
+
+<div class="float-end pb-2">
+    <select id="PageSize" class="form-select form-select-sm" pgcnt>
+        <option selected value="10">10 건</option>
+        <option value="20">20 건</option>
+        <option value="30">30 건</option>
+    </select>
+</div>
+
+<div>
+    <table class="table table-sm table-hover border-top border-bottom shadow-sm text-center align-middle mb-0">
+        <thead>
+            <tr class="align-middle">
+                <th>체계서버 위치</th>
+                <th>작업 부대</th>
+                <th>영문</th>
+                <th>작업일</th>
+                <th>작업목적</th>
+                <th>작업 S/W</th>
+                <th>버전정보</th>
+                <th>상세보기</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                foreach (var l in Model)
+                {
+                    <tr>
+                        <td>@l.LocationName</td>
+                        <td>@l.CorpsName</td>
+                        <td>@l.GateName</td>
+                        <td>@l.InstallationDate</td>
+                        <td>@l.InstallationType</td>
+                        <td>@l.SoftwareName</td>
+                        <td>@l.Version</td>
+                        <td>
+                            <button type="button" class="btn btn-link text-dark" onclick="javascript: fnDetails(@l.InstallationID)">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <div class="pt-3">
+        @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page, Model.PageSize }))
+    </div>
+</div>
+@*<div class="card shadow-sm">
+        <div class="card-header p-3">
+            <big><b>해군 출입통제체계 부대별 최신업데이트 현황</b></big>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm table-hover shadow-sm text-center mb-0">
+                <thead>
+                    <tr>
+                        <th class="align-middle">체계서버 위치</th>
+                        <th class="align-middle">작업 부대</th>
+                        <th class="align-middle">영문</th>
+                        <th class="align-middle">작업일</th>
+                        <th class="align-middle">작업목적</th>
+                        <th class="align-middle">작업 S/W</th>
+                        <th class="align-middle">버전정보</th>
+                        <th class="align-middle">상세보기</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var l in Model)
+                        {
+                            <tr>
+                                <td>@l.CorpsName</td>
+                                <td>@l.LocationName</td>
+                                <td>@l.GateName</td>
+                                <td>@l.InstallationDate</td>
+                                <td>@l.InstallationType</td>
+                                <td>@l.SoftwareName</td>
+                                <td>@l.Version</td>
+                                <td>
+                                    <button type="button" class="btn btn-link text-dark" onclick="javascript: fnDetails(@l.InstallationID)">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer p-0">
+            @Html.PagedListPager(Model, Page => Url.Action("Index", new { Page }))
+        </div>
+    </div>*@
+
+<form id="frmPage" method="get" hidden>
+    <input type="text" id="frmPage" name="Page" value="@Model.PageNumber" hidden readonly />
+    <input type="text" id="frmPageSize" name="PageSize" value="@Model.PageSize" hidden readonly />
+</form>
+
+
+<!-- Modal 영역 -->
+<div id="Detail" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <big class="modal-title"><b>작업이력 상세 정보</b></big>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered align-middle">
+                    <tr>
+                        <th class="bg-light">체계서버 위치</th>
+                        <td>
+                            <text class="LocationName"></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">작업 부대</th>
+                        <td>
+                            <text class="CorpsName"></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">영문</th>
+                        <td>
+                            <text class="GateName"></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">작업일</th>
+                        <td>
+                            <text class="InstallationDate"></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">작업목적</th>
+                        <td>
+                            <text class="InstallationType"></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">작업 S/W</th>
+                        <td>
+                            <text class="SoftwareName"></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">버전 정보</th>
+                        <td>
+                            <text class="Version"></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="bg-light">상세작업정보</th>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <text class="Notes"></text>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
