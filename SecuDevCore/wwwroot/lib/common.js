@@ -1,5 +1,8 @@
 ﻿$().ready(function () {
 
+    // autocomplete : off
+    $("input").attr("autocomplete", "off");
+   
     // 엔터키 이벤트 (ent 요소 유무 확인)
     $("input[ent]").keypress(function (e) {
         if (e.keyCode == 13) {

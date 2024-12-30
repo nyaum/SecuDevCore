@@ -73,8 +73,10 @@
         });
 
         // 모달 dismiss evt
-
         $("#user-manage").on("hidden.bs.modal", function () {
+
+            $("#modify").attr("checked", false);
+
             $("input[name='UserName']").val("")
 
             $("input[name='UID']").val("")
@@ -195,6 +197,8 @@
 
         const AuthorityLevel = $("#AuthorityName").attr("data-value");
 
+        const Modify = $("#modify").is(":checked");
+
         if (UserName == "") {
 
             return;
@@ -205,49 +209,85 @@
             return;
         }
 
-        if (Password == "") {
+        if (Password == "" && Modify === false) {
 
-            return
+            return;
         }
 
-        if (Duplicate && PasswordMatch) {
 
-            const param = "UserName=" + UserName +
-                          "&UID=" + UID +
-                          "&Password=" + Password +
-                          "&Email=" + Email +
-                          "&AuthorityLevel=" + AuthorityLevel;
+        console.log(Password.length)
 
-            $.ajax({
-                type:"POST",
-                url:"/UserConfig/Write",
-                data:param,
-                success:function(data){
+        // 사용자 등록일때
+        if ( Modify === false ) {
 
-                    if (data == 0) {
-                        alert ("입력값을 다시 확인해주세요.")
+            if (Duplicate === false ) {
+                
+                alert ("아이디를 확인 후 다시 입력해주세요.")
 
-                        return;
-                    }
+                return;
+            } 
+            
+            if( PasswordMatch === true) {
 
-                    if (data == -1) {
-                        alert ("등록 중 오류가 발생했습니다.")
+                alert("비밀번호가 서로 일치하지 않습니다.")
 
-                        return;
-                    }
+                return;
+            }
 
-                    if (data == 1 ) {
+        }
+
+        // 사용자 수정일때
+        if ( Modify === true ) {
+
+            if ( Password.length > 0 ) {
+
+                if ( PasswordMatch === false ) {
+
+                    alert("비밀번호가 서로 일치하지 않습니다.")
+
+                    return;
+                }
+
+            }
+
+        }
+
+        const param = "UserName=" + UserName +
+                      "&UID=" + UID +
+                      "&Password=" + Password +
+                      "&Email=" + Email +
+                      "&AuthorityLevel=" + AuthorityLevel +
+                      "&Modify=" + Modify;
+
+        $.ajax({
+            type:"POST",
+            url:"/UserConfig/Write",
+            data:param,
+            success:function(data){
+
+                if (data == 0) {
+                    alert ("입력값을 다시 확인해주세요.")
+
+                    return;
+                }
+
+                if (data == -1) {
+                    alert ("등록 중 오류가 발생했습니다.")
+
+                    return;
+                }
+
+                if (data == 1 ) {
                         
-                        alert ("정상 등록되었습니다.")
+                    alert ("정상 등록되었습니다.")
 
-                        location.href = "/UserConfig"
-
-                    }
+                    location.href = "/UserConfig"
 
                 }
-            })
 
-        }
+            }
+        })
+
     }
 
     function fnChangeStatus(UID, Type){
@@ -303,6 +343,8 @@
             url: "/UserConfig/GetUserInfo",
             data: { "UID" : UID },
             success: function(data){
+
+                $("#modify").attr("checked", true);
 
                 const UserName = data.userName;
                 $("input[name='UserName']").val(UserName)
@@ -442,7 +484,7 @@
 
                 <div class="mb-3">
                     <div class="input-group">
-                        <input type="text" class="form-control border-secondary" name="UID" placeholder="아이디" oninput="fnValidation(this)" />
+                        <input type="text" class="form-control border-secondary" name="UID" placeholder="아이디" oninput="fnValidation(this)" autocomplete="off"/>
                         <button type="button" id="Duplicate_check" class="btn btn-light border-secondary" onclick="javascript:fnCheckUID()">중복확인</button>
                     </div>
                     <span id="Duplicate_alert" class="ms-1 d-none"></span>
@@ -479,6 +521,7 @@
                 <input type="hidden" id="AuthorityLevel" />
             </div>
             <div class="modal-footer">
+                <input type="checkbox" id="modify" />
                 <button type="button" class="btn btn-light border-secondary" onclick="javascript:fnConfirm();">완료</button>
             </div>
         </div>

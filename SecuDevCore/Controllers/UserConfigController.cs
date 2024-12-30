@@ -80,15 +80,37 @@ namespace SecuDevCore.Controllers
         /// <param name="col"></param>
         /// <returns></returns>
         [HttpPost]
-        public int Write(IFormCollection col)
+        public int Write(IFormCollection col, bool Modify)
         {
             int Rtn = -1;
 
             string UserName = col["UserName"];
             string UID = col["UID"];
-            string Password = SHA256.Encrypt(col["Password"]);
+
             string Email = col["Email"];
             int AuthorityLevel = Int32.Parse(col["AuthorityLevel"]);
+
+            string Password = "";
+            string ProcName = "";
+            if (Modify)
+            {
+
+                if (col["Password"] == "")
+                {
+                    Password = "";
+                }
+                else
+                {
+                    Password = SHA256.Encrypt(col["Password"]);
+                }
+
+                ProcName = "PROC_USERCONFIG_UPDATE";
+            }
+            else
+            {
+                Password = SHA256.Encrypt(col["Password"]);
+                ProcName = "PROC_USERCONFIG_REG";
+            }
 
             Dictionary<string, object> param = new Dictionary<string, object>
             {
@@ -96,10 +118,10 @@ namespace SecuDevCore.Controllers
                 { "UID", UID },
                 { "Password", Password },
                 { "Email", Email },
-                { "AuthorityLevel", AuthorityLevel }
+                { "AuthorityLevel", AuthorityLevel },
             };
 
-            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_USERCONFIG_REG", param);
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, ProcName, param);
 
             Rtn = result.ReturnValue;
 
