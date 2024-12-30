@@ -76,6 +76,13 @@
                         return;
                     }
 
+                    if (data == "DELETE") {
+
+                        fnToast("DELETE", 0);
+
+                        return;
+                    }
+
                     location.href = "/Home/Main"
 
                 }
@@ -98,6 +105,9 @@
                 switch (type) {
                     case "Invalid":
                         msg = "유효하지 않은 사용자 이름, 또는 비밀번호 오류 입니다.";
+                        break;
+                    case "DELETE":
+                        msg = "삭제된 계정입니다. 관리자에게 문의해주세요."
                         break;
                     case "UID":
                         msg = "아이디를 다시 입력해주세요.";

@@ -72,6 +72,22 @@
 
         });
 
+        // 모달 dismiss evt
+
+        $("#user-manage").on("hidden.bs.modal", function () {
+            $("input[name='UserName']").val("")
+
+            $("input[name='UID']").val("")
+            $("input[name='UID']").attr("disabled", false)
+            $("#Duplicate_check").attr("disabled", false)
+
+            $("input[name='Email']").val("")
+
+            $("#AuthorityName").text("사용자 레벨")
+            $("#AuthorityName").attr("data-value", "")
+            $("#AuthorityLevel").val("")
+        });
+
     })
 
     // UID 중복확인
@@ -256,7 +272,7 @@
                 
                 if (data == 1) {
 
-                    alert("계정 " + UID + " 가 정상 처리되었습니다.")
+                    alert("정상 처리되었습니다.")
 
                     location.href = "/UserConfig";
                 }
@@ -279,6 +295,40 @@
         })
 
     }
+
+    function fnEdit(UID) {
+
+        $.ajax({
+            type:"POST",
+            url: "/UserConfig/GetUserInfo",
+            data: { "UID" : UID },
+            success: function(data){
+
+                const UserName = data.userName;
+                $("input[name='UserName']").val(UserName)
+
+                const UID = data.uid;
+                $("input[name='UID']").val(UID)
+                $("input[name='UID']").attr("disabled", true)
+                $("#Duplicate_check").attr("disabled", true)
+
+                const Email = data.email;
+                $("input[name='Email']").val(Email)
+
+                const AuthorityName = data["authority"].authorityName;
+                const AuthorityLevel = data["authority"].authorityLevel;
+                $("#AuthorityName").text(AuthorityName)
+                $("#AuthorityName").attr("data-value", AuthorityLevel)
+                $("#AuthorityLevel").val(AuthorityLevel)
+
+                $("#user-manage").modal("show")
+
+            }
+
+        })
+
+    }
+
 </script>
 <div>
     <div class="col pb-3">
@@ -393,7 +443,7 @@
                 <div class="mb-3">
                     <div class="input-group">
                         <input type="text" class="form-control border-secondary" name="UID" placeholder="아이디" oninput="fnValidation(this)" />
-                        <button type="button" class="btn btn-light border-secondary" onclick="javascript:fnCheckUID()">중복확인</button>
+                        <button type="button" id="Duplicate_check" class="btn btn-light border-secondary" onclick="javascript:fnCheckUID()">중복확인</button>
                     </div>
                     <span id="Duplicate_alert" class="ms-1 d-none"></span>
                     <input type="checkbox" name="Duplicate" class="d-none" />

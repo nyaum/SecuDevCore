@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using SecuDev;
 using SecuDev.Models;
 using SingletonManager;
+using System;
 using System.Data;
 using System.Security.Cryptography;
 using X.PagedList.Extensions;
@@ -121,6 +122,30 @@ namespace SecuDevCore.Controllers
             Rtn = result.ReturnValue;
 
             return Rtn;
+        }
+
+        [HttpPost]
+        public IActionResult GetUserInfo(string UID)
+        {
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "UID", UID },
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_USERCONFIG_INFO", param);
+
+            DataSet ds = result.DataSet;
+
+            Users u = new Users();
+
+            u.UID = ds.Tables[0].Rows[0]["UID"].ToString();
+            u.UserName = ds.Tables[0].Rows[0]["UserName"].ToString();
+            u.Email = ds.Tables[0].Rows[0]["Email"].ToString();
+            u.Authority.AuthorityLevel = Int32.Parse(ds.Tables[0].Rows[0]["AuthorityLevel"].ToString());
+            u.Authority.AuthorityName = ds.Tables[0].Rows[0]["AuthorityName"].ToString();
+
+            return Json(u);
         }
     }
 }
