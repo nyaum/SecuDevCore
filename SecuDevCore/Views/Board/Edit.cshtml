@@ -216,6 +216,10 @@
     // 글 작성
     function fnSubmit() {
 
+        var BID = @b.BID;
+
+        const url = new URL(location.href).searchParams;
+        var PageType = url.get("PageType");
 
         var CID = "";
         var Title = "";
@@ -231,6 +235,8 @@
 
         const formData = new FormData();
 
+        formData.append("BID", BID);
+        formData.append("PageType", PageType);
         formData.append("CID", CID);
         formData.append("Title", Title);
         formData.append("Content", b64Content);

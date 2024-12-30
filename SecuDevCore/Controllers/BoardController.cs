@@ -87,6 +87,7 @@ namespace SecuDevCore.Controllers
 
                 DataSet ds = result.DataSet;
 
+                b.BID = Int32.Parse(ds.Tables[0].Rows[0]["BID"].ToString());
                 b.Category.CID = Int32.Parse(ds.Tables[0].Rows[0]["CID"].ToString());
                 b.Category.CategoryName = ds.Tables[0].Rows[0]["CategoryName"].ToString();
                 b.Title = ds.Tables[0].Rows[0]["Title"].ToString();
@@ -135,7 +136,7 @@ namespace SecuDevCore.Controllers
         }
 
         [HttpPost]
-        public int Write(Board b, int? CID, string[] FilePath, string[] DeleteFilePath)
+        public int Write(Board b, int? CID, string[] FilePath, string[] DeleteFilePath, string PageType)
         {
             int Rtn = -1;
 
@@ -173,19 +174,33 @@ namespace SecuDevCore.Controllers
                 }
             }
 
+            string ProcName = "";
+
+            if (PageType == "E")
+            {
+                ProcName = "PROC_BOARD_UPDATE";
+            }
+            else
+            {
+                ProcName = "PROC_BOARD_WRITE";
+            }
 
             Dictionary<string, object> param = new Dictionary<string, object>
             {
+                // 게시판 업데이트용
+                { "BID", b.BID },
+                { "Type", PageType },
+
                 { "CID", CID },
                 { "UID", HttpContext.Session.GetString("UID") },
                 { "Title", b.Title },
                 { "Content", b.Content },
                 { "UUID", dbFilePath },
                 { "FileName", FileName },
-                { "IPAddress", HttpContext.Session.GetString("IPAddress") }
+                { "IPAddress", HttpContext.Session.GetString("IPAddress") },
             };
 
-            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_BOARD_WRITE", param);
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, ProcName, param);
 
             Rtn = result.ReturnValue;
 
