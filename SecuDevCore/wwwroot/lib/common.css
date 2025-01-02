@@ -55,3 +55,17 @@ body {
 .hover:hover {
     background-color: var(--bs-secondary-bg-subtle);
 }
+
+@media (min-width: 576px) and (max-width: 992px) {
+    .text-nowrap {
+        white-space: normal !important;
+    }
+}
+
+.edited-tag::after{
+    margin-left:6px;
+    color:var(--bs-secondary);
+    font-size:12px;
+    content:'(수정됨)'
+
+}

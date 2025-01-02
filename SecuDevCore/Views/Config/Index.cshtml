@@ -1,0 +1,319 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nowDate = Utility.GetNowDate();
+}
+<script>
+    $().ready(function(){
+
+        $("#logoFile").on("change", function(e){
+            var file = e.target.files[0];
+
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                $("#logo-preview").attr("src", e.target.result);
+        
+            }
+
+            reader.readAsDataURL(file);
+
+            fnChanges(this);
+
+        })
+
+        $(".category-div").on('click', function() {
+
+            const target = $(this).attr("data-target");
+            const input = $("#" + target + " .category-input input");
+            const edited_tag = $("#" + target + " .edited-tag");
+
+            // 토글 함수에 들어가기 전에, 수정값이 있으면 (수정됨) 표시 안 보이게 함
+            edited_tag.addClass("d-none");
+
+            fnToggleCategory(target, false);
+
+            input.focus();
+        });
+
+        $(".category-redo").on('click', function(e) {
+
+            e.stopPropagation();
+
+            const target = $(this).attr("data-target");
+
+            fnToggleCategory(target, true);
+
+        });
+
+        $(".category-confirm").on('click', function(e) {
+
+            e.stopPropagation();
+
+            const target = $(this).attr("data-target");
+
+            fnUpdateCategory(target);
+
+        });
+
+    })
+
+    function fnAddCategory() {
+
+        const CID = "new" + new Date().getTime(); // 각 카테고리를 구분할 고유 ID - ex) new2443214321
+        const CategoryName = $("#CategoryName").val()
+
+        // li 요소 생성
+        var li = $('<li>', {
+            id: 'CID_' + CID,
+            class: 'list-group-item'
+        });
+
+        // 내부 div들 생성
+        var flexContainer = $('<div>', { class: 'd-flex align-items-center justify-content-center' });
+
+        // category-div 생성
+        var categoryDiv = $('<div>', {
+            class: 'flex-grow-1 me-3 category-div',
+            'data-target': 'CID_' + CID
+        });
+
+        var categoryName = $('<span>', { class: 'categoryName', text: CategoryName });
+
+        var inputGroup = $('<div>', { class: 'input-group d-none category-input' });
+
+        var inputField = $('<input>', {
+            type: 'text',
+            class: 'form-control form-control-sm',
+            placeholder: CategoryName
+        });
+
+        var confirmButton = $('<button>', {
+            type: 'button',
+            'data-target': 'CID_' + CID,
+            class: 'btn btn-sm category-confirm',
+            style: 'border-color:var(--bs-border-color)'
+        }).append($('<i>', { class: 'fa-solid fa-check text-success' }));
+
+        var redoButton = $('<button>', {
+            type: 'button',
+            'data-target': 'CID_' + CID,
+            class: 'btn btn-sm category-redo',
+            style: 'border-color:var(--bs-border-color)'
+        }).append($('<i>', { class: 'fa-solid fa-xmark text-danger' }));
+
+        inputGroup.append(inputField, confirmButton, redoButton);
+        categoryDiv.append(categoryName, inputGroup);
+
+        // 삭제 버튼
+        var deleteDiv = $('<div>', { class: 'flex-glow-0' });
+        var deleteButton = $('<i>', {
+            class: 'fa-solid fa-minus text-danger',
+            role: 'button',
+            click: function() { 
+
+                li.remove(); 
+
+
+            } // 삭제 버튼 클릭 시 항목 제거
+        });
+        deleteDiv.append(deleteButton);
+
+        // 모든 요소를 flexContainer에 추가
+        flexContainer.append(categoryDiv, deleteDiv);
+
+        // li 요소에 flexContainer 추가
+        li.append(flexContainer);
+
+        // 최종적으로 li를 category-list에 추가
+        $('#CategoryList').append(li);
+
+        $("#CategoryName").val("");
+
+        fnChanges($("#categoryConfig"));
+
+    }
+
+    // 카테고리 보이기/숨기기 처리 함수
+    function fnToggleCategory(target, show) {
+
+        const top = "#" + target;
+        const CategoryName = $(top + " .categoryName");
+        const CategoryInput = $(top + " .category-input");
+
+        if (show === true) {
+
+            CategoryName.removeClass("d-none");
+            CategoryInput.addClass("d-none");
+
+
+
+        } else {
+
+            CategoryName.addClass("d-none");
+            CategoryInput.removeClass("d-none");
+
+        }
+
+    }
+
+    function fnUpdateCategory(target) {
+
+        const top = "#" + target;
+        const CategoryName = $(top + " .categoryName");
+        const CategoryInput = $(top + " .category-input");
+        const input = $(top + " .category-input input");
+
+        const chgValue = input.val()
+
+        if (chgValue == "") {
+
+            fnToggleCategory(target, true);
+
+            return;
+
+        }
+
+        CategoryName.text(chgValue);
+        CategoryName.addClass("edited-tag")
+
+        // Default 값 수정 체크
+        fnChanges($(top));
+
+        fnToggleCategory(target, true);
+
+    }
+
+    function fnChanges(elem)
+    {
+
+        var area = $(elem).closest('div').prop('id')
+
+        $("#" + area + " input[class='isChange']").attr("checked", true);
+
+    }
+
+
+</script>
+
+<!-- 페이지 설정 -->
+<div id="logoConfig">
+
+    <h6>
+        페이지 로고 설정
+        <input type="checkbox" class="isChange" />
+    </h6>
+
+    <ul class="list-group bg-secondary">
+        <li class="list-group-item bg-secondary" align="center">
+            <img id="logo-preview" class="bg-secondary p-3" src="~/img/logo2.png" style="max-height:20vh" />
+        </li>
+        <li class="list-group-item">
+            <input type="file" id="logoFile" class="form-control form-control-sm" accept="image/*" />
+        </li>
+    </ul>
+
+</div>
+
+<hr />
+
+<div class="row">
+    <div id="categoryConfig" class="col">
+        <h6>
+            게시판 카테고리 설정
+            <input type="checkbox" class="isChange" />
+        </h6>
+
+        <ul id="CategoryList" class="list-group">
+
+            <li class="list-group-item">
+                <div class="d-flex">
+                    <div class="flex-grow-1 me-3">
+                        <input id="CategoryName" type="text" class="form-control form-control-sm" maxlength="8" placeholder="카테고리 이름 (최대 8글자까지 가능합니다)" /> 
+                    </div>
+                
+                    <div class="flex-grow-0">
+                        <i role="button" class="fa-solid fa-plus text-success" onclick="javascript:fnAddCategory()"></i>
+                    </div>
+                </div>
+            </li>
+
+            @{
+                foreach(var c in Utility.GetCategoryList()){
+
+                    <li id="CID_@c.CID" class="list-group-item">
+                        <div class="d-flex align-items-center justify-content-center">
+
+                            <div role="button" class="flex-grow-1 me-3 category-div rounded" data-target="CID_@c.CID">
+                                <span class="categoryName">@c.CategoryName</span>
+
+                                <div class="input-group d-none category-input">
+
+                                    <input type="text" class="form-control form-control-sm" placeholder="@Html.Raw(c.CategoryName)" />
+
+                                    <button type="button" data-target="CID_@c.CID" class="btn btn-sm category-confirm bg-white" style="border-color:var(--bs-border-color)">
+                                        <i class="fa-solid fa-check text-success"></i>
+                                    </button>
+
+                                    <button type="button" data-target="CID_@c.CID" class="btn btn-sm category-redo bg-white" style="border-color:var(--bs-border-color)">
+                                        <i class="fa-solid fa-xmark text-danger"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <div class="flex-glow-0">
+                                <i class="fa-solid fa-minus text-danger" role="button"></i>
+                            </div>
+
+                        </div>
+                    </li>
+
+                }
+            }
+        </ul>
+    </div>
+
+    <div class="col">
+        <h6>
+            사용자 권한 설정
+            <input type="checkbox" class="isChange" />
+        </h6>
+
+        <ul class="list-group">
+
+            <li class="list-group-item">
+                <div class="d-flex">
+                    <div class="flex-grow-1 me-3">
+                        <input type="text" class="form-control form-control-sm" maxlength="8" placeholder="권한 그룹 이름 (최대 8글자까지 가능합니다)" />
+                    </div>
+
+                    <div class="flex-grow-0">
+                        <i role="button" class="fa-solid fa-plus text-success"></i>
+                    </div>
+                </div>
+            </li>
+
+            @{
+                foreach (var a in Utility.GetAuthorityList())
+                {
+
+                    <li class="list-group-item d-flex">
+                        <div class="flex-grow-1">
+                            <span>@a.AuthorityName</span>
+                        </div>
+                        <div class="flex-glow-0">
+                            <i class="fa-solid fa-minus text-danger" role="button"></i>
+                        </div>
+                    </li>
+
+                }
+            }
+        </ul>
+    </div>
+</div>
+
+<hr />
