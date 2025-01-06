@@ -1,0 +1,35 @@
+﻿@using SecuDev.Helper
+@{
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+    List<Project> list = ViewBag.list;    
+}
+
+<script>
+    
+</script>
+<div>
+    <h6>진기사 업데이트 이력</h6>
+
+    <table class="table">
+        <tr>
+            <td>장소</td>
+            <td>설치 소프트웨어</td>
+            <td>작업</td>
+            <td>작업자</td>
+            <td>작업일자</td>
+        </tr>
+        @{
+            foreach(var p in list) {
+                <tr>
+                    <td>@p.LocationName</td>
+                    <td>@p.SoftwareName</td>
+                    <td>@p.InstallTypeName</td>
+                    <td>@p.UserName</td>
+                    <td>@Utility.DateTimeFormat(p.InstallDate, 1)</td>
+                </tr>
+
+            }
+        }
+    </table>
+
+</div>

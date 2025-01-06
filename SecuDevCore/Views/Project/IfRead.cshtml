@@ -1,0 +1,209 @@
+﻿@{
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+    }
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+    })
+    function fnClipboard(elem) {
+
+        let $tmp = $("<input>");
+
+        $("body").append($tmp);
+
+        let email = $(elem).children("email").text()
+
+        $tmp.val(email).select();
+
+        document.execCommand("copy");
+
+        $tmp.remove();
+
+        $(elem).attr("title", "클립보드에 복사됨")
+
+        const tooltip = new bootstrap.Tooltip(elem);
+
+        tooltip.show()
+
+        setTimeout(function(){
+
+            tooltip.toggleEnabled()
+
+        }, 3000);
+
+    }
+
+
+</script>
+<div>
+    <h6>프로젝트 담당자</h6>
+
+    <ul class="list-group">
+
+        <li class="list-group-item">
+            <div class="mb-1">
+                <i class="fa-solid fa-star me-1"></i>
+                <span class="">프로젝트 관리자</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-user-tag me-1"></i>
+                <span class="">과장</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-phone me-1"></i>
+                <span class="">010-1234-5678</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-envelope me-1"></i>
+                <span class="" role="button" onclick="javascript:fnClipboard(this)">
+                    <email class="email">PL@company.com</email>
+                    <small class="text-secondary">
+                        <i class="fa-solid fa-copy ms-1"></i>
+                    </small>
+                </span>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <div class="mb-1">
+                <i class="fa-solid fa-star me-1"></i>
+                <span class="">작업자</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-user-tag me-1"></i>
+                <span class="">사원</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-phone me-1"></i>
+                <span class="">010-1234-5678</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-envelope me-1"></i>
+                <span class="" role="button" onclick="javascript:fnClipboard(this)">
+                    <email class="email">worker@company.com</email>
+                    <small class="text-secondary">
+                        <i class="fa-solid fa-copy ms-1"></i>
+                    </small>
+                </span>
+            </div>
+        </li>
+
+    </ul>
+
+</div>
+
+<hr />
+
+<div>
+    <h6>업체 관계자</h6>
+
+    <ul class="list-group">
+
+        <li class="list-group-item">
+            <div class="mb-1">
+                <i class="fa-solid fa-star me-1"></i>
+                <span class="">관계자</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-user-tag me-1"></i>
+                <span class="">사원</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-phone me-1"></i>
+                <span class="">010-1234-5678</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-envelope me-1"></i>
+                <span class="" role="button" onclick="javascript:fnClipboard(this)">
+                    <email class="email">person@company.com</email>
+                    <small class="text-secondary">
+                        <i class="fa-solid fa-copy ms-1"></i>
+                    </small>
+                </span>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <div class="mb-1">
+                <i class="fa-solid fa-star me-1"></i>
+                <span class="">관계자</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-user-tag me-1"></i>
+                <span class="">사원</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-phone me-1"></i>
+                <span class="">010-1234-5678</span>
+            </div>
+            <div class="mb-1">
+                <i class="fa-solid fa-envelope me-1"></i>
+                <span class="" role="button" onclick="javascript:fnClipboard(this)">
+                    <email class="email">sawon@company.com</email>
+                    <small class="text-secondary">
+                        <i class="fa-solid fa-copy ms-1"></i>
+                    </small>
+                </span>
+            </div>
+        </li>
+
+    </ul>
+
+</div>
+
+<hr />
+
+<div>
+    <h6>작업 이력</h6>
+
+    <ul class="list-group">
+        <li role="button" class="list-group-item" onclick="parent.changeIframeUrl('/Project/IfDetail?LocationID=39')">
+            교육사
+        </li>
+        <li role="button" class="list-group-item">
+            해사
+        </li>
+        <li class="list-group-item">
+            리더쉽
+        </li>
+        <li role="button" class="list-group-item">
+            구역 4
+        </li>
+        <li role="button" class="list-group-item">
+            구역 5
+        </li>
+    </ul>
+
+</div>
+
+<hr />
+
+<div>
+    <h6>첨부 파일</h6>
+    <div class="border rounded">
+
+        <div id="fileArea" align="center" class="p-5 text-secondary">
+
+            <div id="file" class="d-none">
+
+                여기는 파일 링크가 들어가는 elem
+
+            </div>
+
+            <div id="fileNotFound">
+
+                <h1>
+                    <i class="fa fa-file-circle-xmark"></i>
+                </h1>
+
+                <h6>
+                    <span>첨부 파일 없음</span>
+                </h6>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

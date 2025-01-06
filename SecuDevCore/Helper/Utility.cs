@@ -12,6 +12,7 @@ using SingletonManager;
 using CoreDAL.ORM;
 using CoreDAL.ORM.Extensions;
 using System.Threading.Tasks;
+using SecuDevCore.Models;
 
 namespace SecuDev.Helper
 {
@@ -191,6 +192,31 @@ namespace SecuDev.Helper
             foreach (DataRow i in ds.Tables[0].Rows)
             {
                 list.Add(i.ToObject<Authority>());
+
+            }
+
+            return list;
+        }
+
+        public static List<Team> GetTeamList()
+        {
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+
+                { "Type", "Team" }
+
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<Team> list = new List<Team>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                list.Add(i.ToObject<Team>());
 
             }
 

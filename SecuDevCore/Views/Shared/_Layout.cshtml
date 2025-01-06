@@ -65,14 +65,28 @@
     <script src="/lib/common.js?"></script>
 
     <script>
+        $().ready(function(){
+        
+            const urlParam = new URL(location.href).searchParams;
+            const Page = window.location.pathname;
+            const collapse = urlParam.get('collapse');
 
+            if (collapse === "true") {
+
+                if (Page == '/Project') {
+                    $("#Project").addClass('show')
+                }
+
+            }
+
+        })
     </script>
 
 </head>
 <body>
 
     <div class="container-fluid min-vh-100 mh-100 p-0 d-flex">
-        <div id="bdSidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-secondary text-white offcanvas-lg offcanvas-start">
+        <div id="bdSidebar" class="d-flex flex-column flex-shrink-0 p-3 bg-secondary text-white offcanvas-lg offcanvas-start w-sm-50">
 
             <img role="button" src="~/img/logo2.png" width="250" class="img-fluid" href="/Home/Main" />
 
@@ -91,12 +105,33 @@
 
             <ul class="list-group list-group-flush">
 
-                <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" href="/LatestUpdate">
+                <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" data-bs-toggle="collapse" data-bs-target="#Project">
                     <span class="d-flex align-items-center justify-content-center">
                         <i class="fa-solid fa-list-check pe-3"></i>
                         프로젝트
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                        <i class="fa-solid fa-ellipsis ms-auto"></i>
                     </span>
+                    <ul id="Project" class="list-group list-group-flush collapse">
+                        <hr class="mb-0" />
+                        <li class="bg-transparent border-0 text-white ms-5 py-3" role="button" href="/Project?TeamID=0&collapse=true">
+                            <span class="d-flex align-items-center justify-content-center">
+                                <span>공용 프로젝트</span>
+                                <i class="fa-solid fa-chevron-right ms-auto"></i>
+                            </span>
+                        </li>
+                        <hr class="m-0" />
+                        @{
+                            foreach(var t in Utility.GetTeamList()){
+                                <li class="bg-transparent border-0 text-white ms-5 py-3" role="button" href="/Project?TeamID=@t.TeamID&collapse=true">
+                                    <span class="d-flex align-items-center justify-content-center">
+                                        <span>@t.TeamName</span>
+                                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                                    </span>
+                                </li>
+                                <hr class="m-0" />
+                            }
+                        }
+                    </ul>
                 </li>
 
                 <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" href="/Board">
