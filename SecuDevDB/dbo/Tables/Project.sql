@@ -1,7 +1,6 @@
 ﻿CREATE TABLE [dbo].[Project] (
     [ProjectID]        INT           IDENTITY (1, 1) NOT NULL,
     [CustomerTypeID]   INT           NOT NULL,
-    [CompanyID]        INT           NOT NULL,
     [LocationID]       INT           NOT NULL,
     [SoftwareID]       INT           NOT NULL,
     [InstallTypeID]    INT           NOT NULL,

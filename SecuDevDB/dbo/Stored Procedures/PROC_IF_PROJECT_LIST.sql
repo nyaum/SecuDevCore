@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE PROC_IF_PROJECT_LIST
+﻿CREATE PROCEDURE [dbo].[PROC_IF_PROJECT_LIST]
 	@LocationID INT = ''
 AS
 BEGIN
@@ -14,6 +14,6 @@ BEGIN
 	INNER JOIN Software s ON s.SoftwareID = p.SoftwareID
 	INNER JOIN InstallType it ON it.InstallTypeID = p.InstallTypeID
 	INNER JOIN Users u ON u.UID = p.ProjectManagerID
-	WHERE p.LocationID = @LocationID
+	WHERE l.ParentLocationID = @LocationID
 	ORDER BY InstallDate DESC
 END
