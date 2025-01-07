@@ -10,23 +10,55 @@
 --------------------------------------------------------------------------------------
 */
 
+
+SET IDENTITY_INSERT [dbo].[Authority] ON 
+
+GO
 INSERT [dbo].[Authority] ([AuthorityLevel], [AuthorityName]) VALUES (0, N'관리자')
 GO
 INSERT [dbo].[Authority] ([AuthorityLevel], [AuthorityName]) VALUES (1, N'사용자')
 GO
-
-
-INSERT [dbo].[Users] ([UID], [UserName], [Password], [Email], [AuthorityLevel], [InsertDate], [UpdateDate], [LastLogin], [Status]) VALUES (N'secu', N'관리자', N'8a72d740d54d0fe0e13b61a72d33555f14d4a292fb1696ab64e48f08bff56ab2', N'', 0, CAST(N'2025-01-07 09:26:02.090' AS DateTime), NULL, NULL, 0)
+SET IDENTITY_INSERT [dbo].[Authority] OFF
 GO
 
+SET IDENTITY_INSERT [dbo].[Category] ON 
 
-INSERT [dbo].[Team] ([TeamID], [TeamName]) VALUES (1, N'개발 1팀')
 GO
-INSERT [dbo].[Team] ([TeamID], [TeamName]) VALUES (2, N'개발 2팀')
+INSERT [dbo].[Category] ([CID], [CategoryName], [InsertDate], [UpdateDate], [BackgroundColor], [FontColor]) VALUES (0, N'일반', CAST(N'2024-12-12 00:00:00.000' AS DateTime), CAST(N'2024-12-12 00:00:00.000' AS DateTime), N'#6c757d', N'#ffffff')
 GO
+INSERT [dbo].[Category] ([CID], [CategoryName], [InsertDate], [UpdateDate], [BackgroundColor], [FontColor]) VALUES (1, N'개발', CAST(N'2024-12-26 00:00:00.000' AS DateTime), NULL, N'#6c757d', N'#ffffff')
+GO
+INSERT [dbo].[Category] ([CID], [CategoryName], [InsertDate], [UpdateDate], [BackgroundColor], [FontColor]) VALUES (2, N'업데이트', CAST(N'2025-01-03 12:42:49.437' AS DateTime), CAST(N'2025-01-03 13:24:09.823' AS DateTime), N'#6c757d', N'#ffffff')
+GO
+INSERT [dbo].[Category] ([CID], [CategoryName], [InsertDate], [UpdateDate], [BackgroundColor], [FontColor]) VALUES (3, N'주간보고 2팀', CAST(N'2025-01-03 17:30:53.917' AS DateTime), NULL, N'#6c757d', N'#ffffff')
+GO
+SET IDENTITY_INSERT [dbo].[Category] OFF
+GO
+SET IDENTITY_INSERT [dbo].[CustomerType] ON 
 
+GO
+INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (1, 2, N'해군', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+GO
+INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (2, NULL, N'병원', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+GO
+INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (3, NULL, N'기업', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+GO
+INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (4, NULL, N'학교', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+GO
+SET IDENTITY_INSERT [dbo].[CustomerType] OFF
+GO
+SET IDENTITY_INSERT [dbo].[InstallType] ON 
 
+GO
+INSERT [dbo].[InstallType] ([InstallTypeID], [InstallTypeName], [InsertDate]) VALUES (1, N'S/W 업데이트', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+GO
+INSERT [dbo].[InstallType] ([InstallTypeID], [InstallTypeName], [InsertDate]) VALUES (2, N'신규 설치', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+GO
+SET IDENTITY_INSERT [dbo].[InstallType] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Location] ON 
 
+GO
 INSERT [dbo].[Location] ([LocationID], [CustomerTypeID], [MasterLocationID], [LocationName], [ParentLocationID], [InsertDate]) VALUES (1, 1, 1, N'진해기지사령부', NULL, CAST(N'2025-01-06 00:00:00.000' AS DateTime))
 GO
 INSERT [dbo].[Location] ([LocationID], [CustomerTypeID], [MasterLocationID], [LocationName], [ParentLocationID], [InsertDate]) VALUES (2, 1, 2, N'1함대', NULL, CAST(N'2025-01-06 00:00:00.000' AS DateTime))
@@ -131,8 +163,12 @@ INSERT [dbo].[Location] ([LocationID], [CustomerTypeID], [MasterLocationID], [Lo
 GO
 INSERT [dbo].[Location] ([LocationID], [CustomerTypeID], [MasterLocationID], [LocationName], [ParentLocationID], [InsertDate]) VALUES (56, 1, 2, N'후문', 11, NULL)
 GO
+SET IDENTITY_INSERT [dbo].[Location] OFF
+GO
 
+SET IDENTITY_INSERT [dbo].[Software] ON 
 
+GO
 INSERT [dbo].[Software] ([SoftwareID], [SoftwareName], [InsertDate]) VALUES (1, N'차량관제', NULL)
 GO
 INSERT [dbo].[Software] ([SoftwareID], [SoftwareName], [InsertDate]) VALUES (2, N'휴대형리더기 앱', NULL)
@@ -153,19 +189,17 @@ INSERT [dbo].[Software] ([SoftwareID], [SoftwareName], [InsertDate]) VALUES (9, 
 GO
 INSERT [dbo].[Software] ([SoftwareID], [SoftwareName], [InsertDate]) VALUES (10, N'반납용 키오스크', NULL)
 GO
+SET IDENTITY_INSERT [dbo].[Software] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Team] ON 
 
-
-INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (1, 2, N'해군', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
 GO
-INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (2, NULL, N'병원', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+INSERT [dbo].[Team] ([TeamID], [TeamName]) VALUES (1, N'개발 1팀')
 GO
-INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (3, NULL, N'기업', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+INSERT [dbo].[Team] ([TeamID], [TeamName]) VALUES (2, N'개발 2팀')
 GO
-INSERT [dbo].[CustomerType] ([CustomerTypeID], [TeamID], [CustomerTypeName], [InsertDate]) VALUES (4, NULL, N'학교', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+SET IDENTITY_INSERT [dbo].[Team] OFF
 GO
 
-
-INSERT [dbo].[InstallType] ([InstallTypeID], [InstallTypeName], [InsertDate]) VALUES (1, N'S/W 업데이트', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
-GO
-INSERT [dbo].[InstallType] ([InstallTypeID], [InstallTypeName], [InsertDate]) VALUES (2, N'신규 설치', CAST(N'2025-01-06 00:00:00.000' AS DateTime))
+INSERT [dbo].[Users] ([UID], [UserName], [Password], [Email], [AuthorityLevel], [InsertDate], [UpdateDate], [LastLogin], [Status]) VALUES (N'secu', N'관리자', N'8a72d740d54d0fe0e13b61a72d33555f14d4a292fb1696ab64e48f08bff56ab2', N'', 0, CAST(N'2025-01-07 09:26:02.090' AS DateTime), NULL, NULL, 0)
 GO
