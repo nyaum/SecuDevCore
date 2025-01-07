@@ -24,13 +24,56 @@ namespace SecuDevCore.Controllers
             _env = webHostEnvironment;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int TeamID)
         {
+            List<Location> list = new List<Location>();
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "Type", "MasterLocationByTeam" },
+                { "SchText", TeamID }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_PROJECT_LOCATION_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                Location l = dr.ToObject<Location>();
+
+                list.Add(l);
+            }
+
+            ViewBag.list = list;
+
             return View();
         }
 
-        public IActionResult IfRead()
+        public IActionResult IfRead(int LocationID)
         {
+
+            List<Location> list = new List<Location>();
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "Type", "LocationByID" },
+                { "SchText", LocationID }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_PROJECT_LOCATION_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                Location l = dr.ToObject<Location>();
+
+                list.Add(l);
+            }
+
+            ViewBag.list = list;
+
             return View();
         }
 

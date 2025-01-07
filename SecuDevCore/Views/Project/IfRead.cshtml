@@ -1,6 +1,8 @@
-﻿@{
+﻿@using SecuDev.Models;
+@{
     Layout = "~/Views/Shared/_PopLayout.cshtml";
-    }
+    List<Location> list = ViewBag.list;
+}
 <script>
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
@@ -158,21 +160,16 @@
     <h6>작업 이력</h6>
 
     <ul class="list-group">
-        <li role="button" class="list-group-item" onclick="parent.changeIframeUrl('/Project/IfDetail?LocationID=39')">
-            교육사
-        </li>
-        <li role="button" class="list-group-item">
-            해사
-        </li>
-        <li class="list-group-item">
-            리더쉽
-        </li>
-        <li role="button" class="list-group-item">
-            구역 4
-        </li>
-        <li role="button" class="list-group-item">
-            구역 5
-        </li>
+        @{
+            foreach(var l in list) {
+
+                <li role="button" class="list-group-item" onclick="parent.changeIframeUrl('/Project/IfDetail?LocationID=@l.LocationID')">
+                    @l.LocationName
+                </li>
+
+            }
+        }
+        
     </ul>
 
 </div>

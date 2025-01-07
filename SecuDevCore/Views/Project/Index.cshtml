@@ -10,6 +10,8 @@
     HttpContextAccessor _Ac = new HttpContextAccessor();
     int AuthorityLevel = Int32.Parse(_Ac.HttpContext.Session.GetString("AuthorityLevel"));
     string UID = _Ac.HttpContext.Session.GetString("UID");
+
+    List<Location> list = ViewBag.list;
 }
 
 <script>
@@ -17,51 +19,37 @@
 
     $().ready(function(){
 
-        // 디버그용
-        $("#proj").modal('show')
+    // 디버그용
+    // $("#proj").modal('show')
 
     })
 
     function changeIframeUrl(url)
     {
-        document.getElementById("IfProject").src = url;
+    document.getElementById("IfProject").src = url;
+    }
+
+    function fnOpenModal(LocationID) {
+
+        $("#IfProject").attr("src", "/Project/IfRead?LocationID=" + LocationID);
+
+        $("#proj").modal('show')
     }
 </script>
 
 <div>
 
     <table class="table table-light">
-        <tr>
-            <td>
-                진해기지사령부
-            </td>
-        </tr>
-        <tr>
-            <td>
-                1함대
-            </td>
-        </tr>
-        <tr>
-            <td>
-                2함대
-            </td>
-        </tr>
-        <tr>
-            <td>
-                3함대
-            </td>
-        </tr>
-        <tr>
-            <td>
-                해군작전사령부
-            </td>
-        </tr>
-        <tr>
-            <td>
-                7전단
-            </td>
-        </tr>
-
+        @{
+            foreach (var l in list)
+            {
+                <tr>
+                    <td role="button" onclick="fnOpenModal(@l.LocationID)">
+                    @l.LocationName
+                    </td>
+                </tr>
+            }
+        }
     </table>
 
 </div>
@@ -86,7 +74,7 @@
 
                 <hr />
 
-                <iframe id="IfProject" src="/Project/IfRead">
+                <iframe id="IfProject">
 
                 </iframe>
 
