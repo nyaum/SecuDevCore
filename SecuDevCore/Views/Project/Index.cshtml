@@ -19,14 +19,54 @@
 
     $().ready(function(){
 
-    // 디버그용
-    // $("#proj").modal('show')
+        $('#tree').treeview({
 
+            data: getTree(),
+            levels: 1,
+            backColor: 'var(--bs-light)',
+            expandIcon: 'fa-solid fa-plus',
+            collapseIcon: 'fa-solid fa-minus',
+            highlightSelected: false,
+        });
+
+        function getTree() {
+
+            var tree = [
+              {
+                text: "해군",
+                nodes: [
+                    {
+                        text: "Child 1",
+                        nodes: [
+                            {
+                                text: "Grandchild 1",
+                            },
+                            {
+                                text: "Grandchild 2",
+                            }
+                        ]
+                    },
+                    {
+                        text: "Child 2",
+                        nodes: [
+
+                        ]
+                    }
+                ]
+              },
+
+            ];
+
+          return tree;
+
+        }
+
+    
     })
 
     function changeIframeUrl(url)
     {
-    document.getElementById("IfProject").src = url;
+        document.getElementById("IfProject").src = url;
     }
 
     function fnOpenModal(LocationID) {
@@ -39,18 +79,7 @@
 
 <div>
 
-    <table class="table table-light">
-        @{
-            foreach (var l in list)
-            {
-                <tr>
-                    <td role="button" onclick="fnOpenModal(@l.LocationID)">
-                    @l.LocationName
-                    </td>
-                </tr>
-            }
-        }
-    </table>
+    <div id="tree"></div>
 
 </div>
 

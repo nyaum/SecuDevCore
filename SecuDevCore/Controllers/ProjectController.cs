@@ -26,7 +26,7 @@ namespace SecuDevCore.Controllers
 
         public IActionResult Index(int TeamID)
         {
-            List<Location> list = new List<Location>();
+            List<Node> list = new List<Node>();
 
             Dictionary<string, object> param = new Dictionary<string, object>
             {
@@ -40,9 +40,7 @@ namespace SecuDevCore.Controllers
 
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                Location l = dr.ToObject<Location>();
 
-                list.Add(l);
             }
 
             ViewBag.list = list;
