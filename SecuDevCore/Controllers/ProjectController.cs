@@ -3,13 +3,16 @@ using CoreDAL.ORM;
 using CoreDAL.ORM.Extensions;
 using CryptoManager;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using SecuDev;
 using SecuDev.Models;
 using SecuDevCore.Models;
 using SingletonManager;
 using System.Data;
+using System.Drawing.Printing;
 using System.Security.Cryptography;
+using X.PagedList.Extensions;
 
 namespace SecuDevCore.Controllers
 {
@@ -55,10 +58,12 @@ namespace SecuDevCore.Controllers
             return View();
         }
 
-        public IActionResult IfRead(int LocationID)
+        public IActionResult IfRead(int LocationID, int? Page, int PageSize = 5)
         {
+            int PageNo = Page ?? 1;
 
             List<Project> list = new List<Project>();
+            List<Contact> contacts = new List<Contact>();
 
             Dictionary<string, object> param = new Dictionary<string, object>
             {
@@ -72,13 +77,20 @@ namespace SecuDevCore.Controllers
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
                 Project p = dr.ToObject<Project>();
-
                 list.Add(p);
             }
 
-            ViewBag.list = list;
+            foreach (DataRow dr in ds.Tables[1].Rows)
+            {
+                Contact c = dr.ToObject<Contact>();
+                contacts.Add(c);
+            }
 
-            return View();
+            ViewBag.list = list;
+            ViewBag.Contact = contacts;
+            ViewBag.LocationID = LocationID;
+
+            return View(list.ToPagedList(PageNo, PageSize));
         }
 
         public IActionResult IfDetail(int LocationID)

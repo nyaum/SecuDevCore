@@ -1,47 +1,53 @@
 ﻿@using SecuDev.Helper
 @using SecuDev.Models;
+@using X.PagedList.Mvc;
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<SecuDev.Models.Project>
 @{
     Layout = "~/Views/Shared/_PopLayout.cshtml";
     List<Project> list = ViewBag.list;
+    List<Contact> contacts = ViewBag.Contact;
 }
 <script>
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl)
+    return new bootstrap.Popover(popoverTriggerEl)
     })
     function fnClipboard(elem) {
 
-        let $tmp = $("<input>");
+    let $tmp = $("<input>");
 
-        $("body").append($tmp);
+    $("body").append($tmp);
 
-        let email = $(elem).children("email").text()
+    let email = $(elem).children("email").text()
 
-        $tmp.val(email).select();
+    $tmp.val(email).select();
 
-        document.execCommand("copy");
+    document.execCommand("copy");
 
-        $tmp.remove();
+    $tmp.remove();
 
-        $(elem).attr("title", "클립보드에 복사됨")
+    $(elem).attr("title", "클립보드에 복사됨")
 
-        const tooltip = new bootstrap.Tooltip(elem);
+    const tooltip = new bootstrap.Tooltip(elem);
 
-        tooltip.show()
+    tooltip.show()
 
-        setTimeout(function(){
+    setTimeout(function(){
 
-            tooltip.toggleEnabled()
+    tooltip.toggleEnabled()
 
-        }, 3000);
+    }, 3000);
 
     }
 
 
 </script>
-<div>
-    <h6>프로젝트 담당자</h6>
-
+@* <div>
+    <div class="d-flex">
+        <h6>프로젝트 담당자</h6>
+        <i class="fa-solid fa-plus ms-auto me-2 text-success"></i>
+    </div>
     <ul class="list-group">
 
         <li class="list-group-item">
@@ -94,62 +100,65 @@
 
     </ul>
 
-</div>
-
-<hr />
+</div> *@
 
 <div>
-    <h6>업체 관계자</h6>
+    <div class="d-flex align-items-center justify-content-center">
+        <h6>업체 관계자</h6>
+        <button type="button" class="btn btn-sm btn-border me-1 ms-auto mb-2">
+            <i class="fa-solid fa-plus me-1 text-success"></i>
+            추가
+        </button>
+    </div>
 
     <ul class="list-group">
 
-        <li class="list-group-item">
-            <div class="mb-1">
-                <i class="fa-solid fa-star me-1"></i>
-                <span class="">관계자</span>
-            </div>
-            <div class="mb-1">
-                <i class="fa-solid fa-user-tag me-1"></i>
-                <span class="">사원</span>
-            </div>
-            <div class="mb-1">
-                <i class="fa-solid fa-phone me-1"></i>
-                <span class="">010-1234-5678</span>
-            </div>
-            <div class="mb-1">
-                <i class="fa-solid fa-envelope me-1"></i>
-                <span class="" role="button" onclick="javascript:fnClipboard(this)">
-                    <email class="email">person@company.com</email>
-                    <small class="text-secondary">
-                        <i class="fa-solid fa-copy ms-1"></i>
-                    </small>
-                </span>
-            </div>
-        </li>
+        @{
+            if (contacts.Count > 0) {
+                foreach (var c in contacts)
+                {
+                    <li class="list-group-item">
+                        <div class="mb-1">
+                            <i class="fa-solid fa-star me-1"></i>
+                            <span class="">@c.ContactName</span>
+                        </div>
+                        <div class="mb-1">
+                            <i class="fa-solid fa-user-tag me-1"></i>
+                            <span class="">@c.Grade</span>
+                        </div>
+                        <div class="mb-1">
+                            <i class="fa-solid fa-phone me-1"></i>
+                            <span class="">@c.Tel</span>
+                        </div>
+                        <div class="mb-1">
+                            <i class="fa-solid fa-envelope me-1"></i>
+                            <span class="" role="button" onclick="javascript:fnClipboard(this)">
+                                <email class="email">@c.Email</email>
+                                <small class="text-secondary">
+                                    <i class="fa-solid fa-copy ms-1"></i>
+                                </small>
+                            </span>
+                        </div>
+                    </li>
+                }
+            }
+            else
+            {
+                <li align="center" class="list-group-item">
 
-        <li class="list-group-item">
-            <div class="mb-1">
-                <i class="fa-solid fa-star me-1"></i>
-                <span class="">관계자</span>
-            </div>
-            <div class="mb-1">
-                <i class="fa-solid fa-user-tag me-1"></i>
-                <span class="">사원</span>
-            </div>
-            <div class="mb-1">
-                <i class="fa-solid fa-phone me-1"></i>
-                <span class="">010-1234-5678</span>
-            </div>
-            <div class="mb-1">
-                <i class="fa-solid fa-envelope me-1"></i>
-                <span class="" role="button" onclick="javascript:fnClipboard(this)">
-                    <email class="email">sawon@company.com</email>
-                    <small class="text-secondary">
-                        <i class="fa-solid fa-copy ms-1"></i>
-                    </small>
-                </span>
-            </div>
-        </li>
+                    <div class="py-5 text-secondary">
+                        <h1>
+                            <i class="fa-solid fa-users-slash"></i>
+                        </h1>
+
+                        <h6>
+                            <span>등록된 인원 없음</span>
+                        </h6>
+                    </div>
+                
+                </li>
+            }
+        }
 
     </ul>
 
@@ -158,36 +167,60 @@
 <hr />
 
 <div>
-    <h6>작업 이력</h6>
-
+    <div class="d-flex align-items-center justify-content-center">
+        <h6>작업 이력</h6>
+        <button type="button" class="btn btn-sm btn-border me-1 ms-auto mb-2">
+            <i class="fa-solid fa-plus me-1 text-success"></i>
+            추가
+        </button>
+    </div>
     <div class="border rounded-1">
-        <table class="table table-hover rounded-1 text-center mb-0">
+        @{
+            if (list.Count > 0){
+                <table class="table table-hover rounded-1 text-center">
 
-            <thead>
-                <tr>
-                    <th>설치 소프트웨어</th>
-                    <th>작업</th>
-                    <th>작업자</th>
-                    <th>작업일자</th>
-                </tr>
-            </thead>
+                    <thead>
+                        <tr>
+                            <th>설치 소프트웨어</th>
+                            <th>작업</th>
+                            <th>작업자</th>
+                            <th>작업일자</th>
+                        </tr>
+                    </thead>
 
-            <tbody>
-            @{
-                foreach (var p in list)
-                {
+                    <tbody>
+                
+                    @{
+                        foreach (var p in Model)
+                        {
 
-                    <tr role="button">
-                        <td>@p.SoftwareName</td>
-                        <td>@p.InstallTypeName</td>
-                        <td>@p.UserName</td>
-                        <td>@Utility.DateTimeFormat(p.InstallDate, 1)</td>
-                    </tr>
+                            <tr role="button">
+                                <td>@p.SoftwareName</td>
+                                <td>@p.InstallTypeName</td>
+                                <td>@p.UserName</td>
+                                <td>@Utility.DateTimeFormat(p.InstallDate, 1)</td>
+                            </tr>
 
-                }
+                        }
+                    }
+
+                    </tbody>
+                </table>
+                @Html.PagedListPager(Model, Page => Url.Action("IfRead", new { ViewBag.LocationID, Page, Model.PageSize }))
             }
-            </tbody>
-        </table>
+            else 
+            {
+                <div align="center" class="py-5 text-secondary">
+                    <h1>
+                        <i class="fa-regular fa-calendar-xmark"></i>
+                    </h1>
+
+                    <h6>
+                        <span>작업 이력 없음</span>
+                    </h6>
+                </div>
+            }
+        }
     </div>
 </div>
 
