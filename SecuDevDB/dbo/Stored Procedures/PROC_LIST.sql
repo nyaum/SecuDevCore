@@ -37,4 +37,14 @@ BEGIN
 		FROM Team
 	END
 
+	-- Location List TreeView SELECT
+	IF @Type = 'LocationTreeView'
+	BEGIN
+		SELECT 
+			ParentLocationID,
+			LocationID,
+			LocationName as [text]
+		FROM dbo.fnLocationDepth()
+	END
+
 END

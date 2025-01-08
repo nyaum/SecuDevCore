@@ -4,6 +4,7 @@
     [MasterLocationID] INT           NOT NULL,
     [LocationName]     VARCHAR (500) NULL,
     [ParentLocationID] INT           NULL,
+    [ContactIDs]       VARCHAR (500) NULL,
     [InsertDate]       DATETIME      NULL,
     CONSTRAINT [PK_Location] PRIMARY KEY CLUSTERED ([LocationID] ASC)
 );
