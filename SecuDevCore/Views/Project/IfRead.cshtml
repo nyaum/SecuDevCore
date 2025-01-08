@@ -1,7 +1,8 @@
-﻿@using SecuDev.Models;
+﻿@using SecuDev.Helper
+@using SecuDev.Models;
 @{
     Layout = "~/Views/Shared/_PopLayout.cshtml";
-    List<Location> list = ViewBag.list;
+    List<Project> list = ViewBag.list;
 }
 <script>
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
@@ -159,24 +160,38 @@
 <div>
     <h6>작업 이력</h6>
 
-    <ul class="list-group">
-        @{
-            foreach(var l in list) {
+    <div class="border rounded-1">
+        <table class="table table-hover rounded-1 text-center mb-0">
 
-                <li role="button" class="list-group-item" onclick="parent.changeIframeUrl('/Project/IfDetail?LocationID=@l.LocationID')">
-                    @l.LocationName
-                </li>
+            <thead>
+                <tr>
+                    <th>설치 소프트웨어</th>
+                    <th>작업</th>
+                    <th>작업자</th>
+                    <th>작업일자</th>
+                </tr>
+            </thead>
 
+            <tbody>
+            @{
+                foreach (var p in list)
+                {
+
+                    <tr role="button">
+                        <td>@p.SoftwareName</td>
+                        <td>@p.InstallTypeName</td>
+                        <td>@p.UserName</td>
+                        <td>@Utility.DateTimeFormat(p.InstallDate, 1)</td>
+                    </tr>
+
+                }
             }
-        }
-        
-    </ul>
-
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<hr />
-
-<div>
+@* <div>
     <h6>첨부 파일</h6>
     <div class="border rounded">
 
@@ -203,4 +218,4 @@
         </div>
 
     </div>
-</div>
+</div> *@

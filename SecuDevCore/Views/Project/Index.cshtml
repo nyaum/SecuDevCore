@@ -1,17 +1,17 @@
 ﻿@using SecuDev.Models;
 @using SecuDev.Helper;
 @using X.PagedList.Mvc;
-@using X.PagedList.Mvc.Core
-@model X.PagedList.IPagedList<SecuDev.Models.Users>
+@using X.PagedList.Mvc.Core;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     string nowDate = Utility.GetNowDate();
+
+    string tree = ViewBag.tree;
 
     HttpContextAccessor _Ac = new HttpContextAccessor();
     int AuthorityLevel = Int32.Parse(_Ac.HttpContext.Session.GetString("AuthorityLevel"));
     string UID = _Ac.HttpContext.Session.GetString("UID");
 
-    List<Location> list = ViewBag.list;
 }
 
 <script>
@@ -23,46 +23,49 @@
 
             data: getTree(),
             levels: 1,
-            backColor: 'var(--bs-light)',
             expandIcon: 'fa-solid fa-plus',
             collapseIcon: 'fa-solid fa-minus',
+            emptyIcon: 'fa-solid fa-caret-right',
             highlightSelected: false,
+            onNodeSelected: function(event, data) {
+            
+                if(data.nodes == null) {
+
+                    var LocationID = data.LocationID
+
+                    fnOpenModal(LocationID)
+
+                }
+                else 
+                {
+                    $('#tree').treeview('toggleNodeExpanded', [ data.nodeId, { silent: true } ]);
+                }
+            
+            }
         });
 
         function getTree() {
 
-            var tree = [
-              {
-                text: "해군",
-                nodes: [
-                    {
-                        text: "Child 1",
-                        nodes: [
-                            {
-                                text: "Grandchild 1",
-                            },
-                            {
-                                text: "Grandchild 2",
-                            }
-                        ]
-                    },
-                    {
-                        text: "Child 2",
-                        nodes: [
+            var tree = @Html.Raw(tree)
 
-                        ]
-                    }
-                ]
-              },
-
-            ];
-
-          return tree;
+            return tree;
 
         }
 
-    
+
     })
+
+    function fnSearch()
+    {
+
+        const search = $("#search-node").val();
+
+        $('#tree').treeview('search', [ search, {
+            ignoreCase: true,     // case insensitive
+            exactMatch: false,    // like or equals
+            revealResults: true,  // reveal matching nodes
+        }]);
+    }
 
     function changeIframeUrl(url)
     {
@@ -78,6 +81,14 @@
 </script>
 
 <div>
+    <div id="search-area" class="d-flex mb-3">
+        <div class="input-group input-group-sm flex-grow-1">
+            <input id="search-node" type="text" class="form-control form-control-sm" placeholder="검색어 입력" ent="fnSearch()"/>
+            <button type="button" class="btn btn-sm btn-border">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+    </div>
 
     <div id="tree"></div>
 
@@ -88,6 +99,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h6>프로젝트 이름</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
 

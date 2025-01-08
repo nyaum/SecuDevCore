@@ -3,6 +3,7 @@ using CoreDAL.ORM;
 using CoreDAL.ORM.Extensions;
 using CryptoManager;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SecuDev;
 using SecuDev.Models;
 using SecuDevCore.Models;
@@ -26,24 +27,30 @@ namespace SecuDevCore.Controllers
 
         public IActionResult Index(int TeamID)
         {
-            List<Node> list = new List<Node>();
+            List<Tree> list = new List<Tree>();
 
             Dictionary<string, object> param = new Dictionary<string, object>
             {
-                { "Type", "MasterLocationByTeam" },
-                { "SchText", TeamID }
+                { "Type", "LocationTreeView" }
             };
 
-            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_PROJECT_LOCATION_LIST", param);
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LIST", param);
 
             DataSet ds = result.DataSet;
 
-            foreach (DataRow dr in ds.Tables[0].Rows)
-            {
+            list = ds.Tables[0].ToObject<Tree>() as List<Tree>;
 
+            var tree = list.ToLookup(x => x.ParentLocationID);
+
+            foreach (var t in list)
+            {
+                if (tree[t.LocationID].Count() > 0)
+                {
+                    t.nodes = tree[t.LocationID].ToList<Tree>();
+                }
             }
 
-            ViewBag.list = list;
+            ViewBag.tree = JsonConvert.SerializeObject(tree[null].ToList());
 
             return View();
         }
@@ -51,23 +58,22 @@ namespace SecuDevCore.Controllers
         public IActionResult IfRead(int LocationID)
         {
 
-            List<Location> list = new List<Location>();
+            List<Project> list = new List<Project>();
 
             Dictionary<string, object> param = new Dictionary<string, object>
             {
-                { "Type", "LocationByID" },
-                { "SchText", LocationID }
+                { "LocationID", LocationID }
             };
 
-            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_PROJECT_LOCATION_LIST", param);
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_LIST", param);
 
             DataSet ds = result.DataSet;
 
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                Location l = dr.ToObject<Location>();
+                Project p = dr.ToObject<Project>();
 
-                list.Add(l);
+                list.Add(p);
             }
 
             ViewBag.list = list;
