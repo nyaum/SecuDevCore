@@ -40,9 +40,17 @@
     });
 
     $().ready(function(){
+    
+        fnCreateTree()
+
+
+    })
+
+    function fnCreateTree() { 
+
+        $('#tree').html("");
 
         $('#tree').treeview({
-
             data: getTree(),
             levels: 1,
             expandIcon: 'fa-solid fa-plus',
@@ -50,7 +58,7 @@
             emptyIcon: 'fa-solid fa-caret-right',
             highlightSelected: false,
             onNodeSelected: function(event, data) {
-            
+
                 if(data.nodes == null) {
 
                     var LocationID = data.LocationID
@@ -58,24 +66,23 @@
                     fnOpenModal(LocationID)
 
                 }
-                else 
+                else
                 {
                     $('#tree').treeview('toggleNodeExpanded', [ data.nodeId, { silent: true } ]);
                 }
-            
+
             }
         });
 
-        function getTree() {
+    }
 
-            var tree = @Html.Raw(tree)
+    function getTree() {
 
-            return tree;
+        var tree = @Html.Raw(tree)
 
-        }
+        return tree;
 
-
-    })
+    }
 
     function fnSearch()
     {
@@ -111,7 +118,10 @@
             </button>
         </div>
     </div>
-
+    <button type="button" onclick="fnCreateTree()" class="btn btn-sm btn-border me-1 ms-auto mb-2">
+        <i class="fa-solid fa-plus me-1 text-success"></i>
+        추가
+    </button>
     <div id="tree"></div>
 
 </div>

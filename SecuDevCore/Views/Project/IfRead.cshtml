@@ -9,38 +9,39 @@
     List<Contact> contacts = ViewBag.Contact;
 }
 <script>
+
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-    return new bootstrap.Popover(popoverTriggerEl)
+        return new bootstrap.Popover(popoverTriggerEl)
     })
+
     function fnClipboard(elem) {
 
-    let $tmp = $("<input>");
+        let $tmp = $("<input>");
 
-    $("body").append($tmp);
+        $("body").append($tmp);
 
-    let email = $(elem).children("email").text()
+        let email = $(elem).children("email").text()
 
-    $tmp.val(email).select();
+        $tmp.val(email).select();
 
-    document.execCommand("copy");
+        document.execCommand("copy");
 
-    $tmp.remove();
+        $tmp.remove();
 
-    $(elem).attr("title", "클립보드에 복사됨")
+        $(elem).attr("title", "클립보드에 복사됨")
 
-    const tooltip = new bootstrap.Tooltip(elem);
+        const tooltip = new bootstrap.Tooltip(elem);
 
-    tooltip.show()
+        tooltip.show()
 
-    setTimeout(function(){
+        setTimeout(function(){
 
-    tooltip.toggleEnabled()
+            tooltip.toggleEnabled()
 
-    }, 3000);
+        }, 3000);
 
     }
-
 
 </script>
 @* <div>
@@ -115,6 +116,7 @@
 
         @{
             if (contacts.Count > 0) {
+
                 foreach (var c in contacts)
                 {
                     <li class="list-group-item">
@@ -169,7 +171,7 @@
 <div>
     <div class="d-flex align-items-center justify-content-center">
         <h6>작업 이력</h6>
-        <button type="button" class="btn btn-sm btn-border me-1 ms-auto mb-2">
+        <button type="button" onclick="parent.changeIframeUrl('/Project/IfWriteHistory?LocationID=@ViewBag.LocationID')" class="btn btn-sm btn-border me-1 ms-auto mb-2">
             <i class="fa-solid fa-plus me-1 text-success"></i>
             추가
         </button>
@@ -181,8 +183,8 @@
 
                     <thead>
                         <tr>
-                            <th>설치 소프트웨어</th>
-                            <th>작업</th>
+                            <th>작업 소프트웨어</th>
+                            <th>작업 분류</th>
                             <th>작업자</th>
                             <th>작업일자</th>
                         </tr>

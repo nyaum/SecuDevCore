@@ -223,6 +223,80 @@ namespace SecuDev.Helper
             return list;
         }
 
+        public static List<Software> GetSoftwareList()
+        {
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+
+                { "Type", "Software" }
+
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<Software> list = new List<Software>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                list.Add(i.ToObject<Software>());
+
+            }
+
+            return list;
+        }
+
+        public static List<InstallType> GetInstallTypeList()
+        {
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+
+                { "Type", "InstallType" }
+
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<InstallType> list = new List<InstallType>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                list.Add(i.ToObject<InstallType>());
+
+            }
+
+            return list;
+        }
+
+        public static List<Users> GetUserList()
+        {
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+
+                { "Type", "User" }
+
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<Users> list = new List<Users>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                list.Add(i.ToObject<Users>());
+
+            }
+
+            return list;
+        }
+
         /// <summary>
         /// 사용자 아이피 주소
         /// </summary>

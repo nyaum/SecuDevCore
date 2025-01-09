@@ -1,0 +1,293 @@
+﻿@using SecuDev.Helper
+@using SecuDev.Models;
+@{
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+    var LocationID = ViewBag.LocationID;
+}
+<!-- FilePond -->
+<script src="~/lib/FilePond/filepond.min.js"></script>
+<script src="~/lib/FilePond/filepond-plugin-file-validate-size.js"></script>
+<script src="~/lib/FilePond/filepond-plugin-image-preview.min.js"></script>
+<script src="~/lib/FilePond/filepond.jquery.js"></script>
+<link rel="stylesheet" href="~/lib/FilePond/filepond.css" />
+
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0-rc.4/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0-rc.4/dist/js/tom-select.complete.min.js"></script>
+
+<style>
+    body {
+        overflow-x:hidden;
+    }
+</style>
+
+<script>
+
+    let FILELIST = [];
+    let DEL_FILELIST = [];
+
+    var Software = ""
+    var InstallType = ""
+    var User = ""
+
+    $().ready(function () {
+
+        // Set plugins && opt
+        fnCreateFilePond();
+
+        const opt = {
+            // create: function(input) {
+            //     const now = new Date()
+
+            //     return {value: now.getTime(), text:input}
+
+            // },
+            create: true,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        }
+        
+        Software = new TomSelect("#Software", opt) ;
+        InstallType = new TomSelect("#InstallType", opt);
+        User = new TomSelect("#User", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+
+    })
+
+    function fnCreateFilePond(file) {
+
+        FilePond.registerPlugin(FilePondPluginFileValidateSize);
+
+        // Turn input element into a pond
+        $('#fileUpload').filepond();
+
+        var opt = {
+            allowMultiple: true,
+            maxFileSize: '50MB',
+            labelMaxFileSizeExceeded: '파일 사이즈 오류',
+            labelMaxFileSize: '최대 {filesize} 까지 업로드 가능합니다',
+            labelIdle: '파일을 드래그 앤 드랍하거나, <span class="filepond--label-action"> 폴더에서 찾기 </span>',
+            labelFileProcessingComplete: '업로드 완료',
+            labelFileProcessingAborted: '업로드 취소',
+            labelFileProcessing: '처리중...',
+            labelFileProcessingError: '오류가 발생했습니다',
+            labelFileProcessingRevertError: '오류가 발생했습니다',
+            files: file,
+            server: {
+                process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+
+                    const formData = new FormData();
+
+                    formData.append("fieldName", fieldName);
+                    formData.append("file", file);
+                    formData.append("fileName", file.name);
+
+                    const request = new XMLHttpRequest();
+                    request.open('POST', '/Board/FileUpload', true);
+
+                    request.upload.onprogress = (e) => {
+                        progress(e.lengthComputable, e.loaded, e.total);
+                    };
+
+                    request.onload = function () {
+                        if (request.status >= 200 && request.status < 300) {
+
+                            load(request.responseText);
+
+
+                            // 인코딩된 파일 정보 보내기
+                            //FILELIST.push(request.responseText)
+                            FILELIST.push(JSON.parse(request.responseText));
+
+                            console.log(FILELIST)
+
+                        } else {
+
+                            error('error! > ' + request.status);
+
+                        }
+                    };
+
+                    request.send(formData);
+
+                    return {
+                        abort: () => {
+
+                            request.abort();
+
+                            abort();
+
+                        },
+                    };
+                },
+                revert: (uniqueFileId, load, error) => {
+
+                    var parse = JSON.parse(uniqueFileId);
+
+                    DEL_FILELIST.push(parse);
+
+                    console.log(parse);
+
+                    var uuid = parse["uuid"];
+                    let idx = FILELIST.findIndex(item => item.uuid === uuid);
+
+                    if (idx !== -1) {
+                        FILELIST.splice(idx, 1);
+                    }
+
+                    load();
+
+                },
+            },
+        }
+
+        $('#fileUpload').filepond(opt)
+
+    }
+
+    function fnSubmit() {
+
+        var SoftwareID = Software.getValue();
+        var InstallTypeID = InstallType.getValue();
+        var UID = User.getValue();
+        var Content = $("#Content").val();
+        var LocationID = @LocationID;
+        var Version = $("#Version").val();
+        
+        const formData = new FormData();
+
+        formData.append("SoftwareID", SoftwareID)
+        formData.append("InstallTypeID", InstallTypeID)
+        formData.append("UID", UID)
+        formData.append("Content", Content)
+        formData.append("LocationID", LocationID)
+        formData.append("Version", Version)
+
+        // 파일 업로드
+        for (var i = 0; i < FILELIST.length; i++) {
+
+            formData.append("FilePath[" + i + "]", FILELIST[i]["uniqueFileId"] + "," + FILELIST[i]["fileName"]);
+
+        }
+
+        $.ajax({
+            type:'POST',
+            url: '/Project/WriteHistory',
+            contentType: false,
+            processData: false,
+            data: formData,
+            success: function(data){
+            
+                if (data == 1) {
+
+                    alert("정상 처리되었습니다.")
+
+                    parent.location.reload();
+
+                }
+                else {
+
+                    alert("처리중 오류가 발생했습니다.")
+                    
+                    return;
+                }
+
+
+            }
+        })
+
+    }
+</script>
+<div>
+    <h6>작업 장소</h6>
+    <span>해군작전사령부</span>
+
+    <hr />
+
+    <div class="row">
+
+        <div class="col">
+            <h6>작업 소프트웨어</h6>
+            <select id="Software" placeholder="작업 소프트웨어 선택">
+                <option></option>
+                @{
+                    foreach (var s in Utility.GetSoftwareList())
+                    {
+                        <option data-value="@s.SoftwareID" data-text="@s.SoftwareName">@s.SoftwareName</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col">
+
+            <h6>작업 분류</h6>
+            <select id="InstallType" placeholder="작업 분류 선택">
+                <option></option>
+                @{
+                    foreach (var i in Utility.GetInstallTypeList())
+                    {
+                        <option data-value="@i.InstallTypeID" data-text="@i.InstallTypeName">@i.InstallTypeName</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+
+        <div class="col">
+
+            <h6>작업자</h6>
+            <select id="User" placeholder="작업자 선택">
+                <option></option>
+                @{
+                    foreach (var u in Utility.GetUserList())
+                    {
+                        <option data-value="@u.UID">@u.UserName</option>
+                    }
+                }
+            </select>
+
+        </div>
+        
+        <div class="col">
+            <h6>버전 정보</h6>
+            <input id="Version" type="text" class="form-control ts-control" placeholder="버전 정보 입력"/>
+        </div>
+
+    </div>
+
+    <hr />
+
+    <h6>작업 내용</h6>
+    <textarea id="Content" class="form-control" rows="5"></textarea>
+
+    <hr />
+
+    <div>
+        <h6>첨부 파일 추가</h6>
+        <div class="border rounded">
+
+            <input type="file" id="fileUpload" class="m-4" multiple />
+
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="float-end">
+        <button type="button" class="btn btn-border" onclick="javascript: fnSubmit();">
+            <i class="fa-solid fa-check me-2"></i>
+            작성
+        </button>
+    </div>
+
+</div>
