@@ -14,86 +14,57 @@
 
 }
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
 <script>
 
-    window.addEventListener('load', function() {
+    $().ready(function(){
 
-        var allElements = document.getElementsByTagName('*');
+        var jstree =
+        $("#tree").jstree({
+            'core' : {'data' : getData()},
+            'plugins': ['search', 'types'],
+            'types': {
+                'default' : {
+                    'icon' : false
+                }
+            }
+        })
+        .on('ready.jstree', function (e, data) {
+            data.instance.close_all()
+            data.instance.deselect_all()
+        });
 
-        Array.prototype.forEach.call(allElements, function(el) {
+        jstree.bind("dblclick.jstree", function (evt) {
+            var tree = $(this).jstree(); 			
+            var node = tree.get_node(evt.target); 			
+            
+            if (node.children.length == 0) {
 
-            var includePath = el.dataset.includePath;
-
-            if (includePath) {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        el.outerHTML = this.responseText;
-                    }
-            };
-
-            xhttp.open('GET', includePath, true);
-            xhttp.send();
+                fnOpenModal(node.id)
 
             }
+
         });
-    });
 
-    $().ready(function(){
-    
-        fnCreateTree()
+        var target = false;
 
+        $('#search-node').keyup(function () {
+            if(target) { clearTimeout(target); }
+                to = setTimeout(function () {
+                var v = $('#search-node').val();
+                $('#tree').jstree(true).search(v);
+            }, 250);
+        });
 
     })
 
-    function fnCreateTree() { 
+    function getData() {
 
-        $('#tree').html("");
+        var data = @Html.Raw(tree)
 
-        $('#tree').treeview({
-            data: getTree(),
-            levels: 1,
-            expandIcon: 'fa-solid fa-plus',
-            collapseIcon: 'fa-solid fa-minus',
-            emptyIcon: 'fa-solid fa-caret-right',
-            highlightSelected: false,
-            onNodeSelected: function(event, data) {
-
-                if(data.nodes == null) {
-
-                    var LocationID = data.LocationID
-
-                    fnOpenModal(LocationID)
-
-                }
-                else
-                {
-                    $('#tree').treeview('toggleNodeExpanded', [ data.nodeId, { silent: true } ]);
-                }
-
-            }
-        });
-
-    }
-
-    function getTree() {
-
-        var tree = @Html.Raw(tree)
-
-        return tree;
-
-    }
-
-    function fnSearch()
-    {
-
-        const search = $("#search-node").val();
-
-        $('#tree').treeview('search', [ search, {
-            ignoreCase: true,     // case insensitive
-            exactMatch: false,    // like or equals
-            revealResults: true,  // reveal matching nodes
-        }]);
+        return data;
     }
 
     function changeIframeUrl(url)
@@ -107,22 +78,39 @@
 
         $("#proj").modal('show')
     }
+
+    function fnAddNode() {
+
+        var newNode = {'text':'New Node'}
+
+        $('#tree').jstree('create_node', '#', newNode, 'last');
+
+    }
 </script>
 
 <div>
-    <div id="search-area" class="d-flex mb-3">
-        <div class="input-group input-group-sm flex-grow-1">
-            <input id="search-node" type="text" class="form-control form-control-sm" placeholder="검색어 입력" ent="fnSearch()"/>
-            <button type="button" class="btn btn-sm btn-border">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+
+    <div class="card">
+        <div class="card-body">
+
+            <div id="search-area" class="d-flex mb-3">
+                <div class="input-group input-group-sm flex-grow-1">
+                    <input id="search-node" type="text" class="form-control form-control-sm" placeholder="검색어 입력" ent="fnSearch()" />
+                </div>
+            </div>
+
+            <div>
+                <button type="button" onclick="fnAddNode()" class="btn btn-sm btn-border me-1 ms-auto mb-2">
+                    <i class="fa-solid fa-plus me-1 text-success"></i>
+                    추가
+                </button>
+            </div>
+
+            <hr />
+
+            <div id="tree" class="pb-3"></div>
         </div>
     </div>
-    <button type="button" onclick="fnCreateTree()" class="btn btn-sm btn-border me-1 ms-auto mb-2">
-        <i class="fa-solid fa-plus me-1 text-success"></i>
-        추가
-    </button>
-    <div id="tree"></div>
 
 </div>
 

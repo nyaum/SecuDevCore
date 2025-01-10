@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using SecuDev;
 using SecuDev.Models;
+using SecuDevCore.Helper;
 using SecuDevCore.Models;
 using SingletonManager;
 using System;
@@ -54,7 +55,8 @@ namespace SecuDevCore.Controllers
                 }
             }
 
-            ViewBag.tree = JsonConvert.SerializeObject(tree[null].ToList());
+            var jsTreeData = TreeHelper.JsTreeFormat(list);
+            ViewBag.tree = JsonConvert.SerializeObject(jsTreeData);
 
             return View();
         }
