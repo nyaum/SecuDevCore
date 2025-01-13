@@ -21,9 +21,12 @@
 
     $().ready(function(){
 
-        var jstree =
+        var jstree = 
         $("#tree").jstree({
-            'core' : {'data' : getData()},
+            'core' : {
+                'data' : getData(),
+                'check_callback': true
+            },
             'plugins': ['search', 'types'],
             'types': {
                 'default' : {
@@ -79,12 +82,127 @@
         $("#proj").modal('show')
     }
 
+    function fnCheckLocation(id) {
+
+        var Rtn = 0;
+
+        // 이력이 있는지 확인
+        $.ajax({
+            type: "POST",
+            async: false,
+            url: "/Project/CheckLocation",
+            data: { LocationID : id },
+            success : function(data){
+                Rtn = data;
+            }
+        })
+
+        return Rtn;
+
+    }
+
     function fnAddNode() {
 
-        var newNode = {'text':'New Node'}
+        var newNode = { text : 'New Node' }
 
-        $('#tree').jstree('create_node', '#', newNode, 'last');
+        var parent = $("#tree").jstree('get_selected', true);
+        
+        if ( parent.length > 0 )
+        {
 
+            parent = parent[0].id
+
+            var Rtn = fnCheckLocation(parent);
+
+            // data = 1 > 이력 있음
+            if (Rtn == 1) {
+                alert("선택된 위치에 이력이 존재합니다.")
+
+                return;
+            }
+
+        }
+        else
+        {
+            parent = '#'
+        }
+
+
+        $('#tree').jstree('create_node', parent, newNode, 'last', function(node){
+
+            $("#tree").jstree('select_node', node.id)
+            
+            fnRenameNode('A', node)
+
+        });
+
+    }
+
+    function fnRenameNode(type, node) {
+
+        if (type == 'A')
+        {
+            
+        }
+        else {
+            node = $("#tree").jstree('get_selected', true)[0];
+        }
+
+        $('#tree').jstree("deselect_all");
+
+        $("#tree").jstree('edit', node.id, null, function (node) {
+
+            const id = node.id;
+            const name = node.text;
+            const parent = node.parent;
+
+            $.ajax({
+                type: "POST",
+                url: "/Project/WriteLocation",
+                data: { id : id, ParentLocationID : parent, name : name },
+                success: function (data) {
+                
+                    $("#tree").jstree().set_id(node, data)
+
+                }
+            })
+
+        });
+
+    }
+
+    function fnDeleteNode () {
+
+        const node = $("#tree").jstree('get_selected', true)[0];
+
+        var Rtn = fnCheckLocation(node.id);
+
+        // data = 1 > 이력 있음
+        if (Rtn == 1) {
+            alert("선택된 위치에 이력이 존재합니다.")
+
+            return;
+        }
+        else if (Rtn == 2) {
+            alert("선택된 위치에 하위 위치가 존재합니다.")
+
+            return;
+        }
+
+        if (confirm("삭제하시겠습니까?")) {
+
+            $.ajax({
+                type: "POST",
+                url: "/Project/DeleteLocation",
+                data: { LocationID : node.id },
+                success: function(data) {
+
+                    $("#tree").jstree().delete_node(node.id);
+
+                }
+            })
+
+        }
     }
 </script>
 
@@ -99,11 +217,23 @@
                 </div>
             </div>
 
-            <div>
-                <button type="button" onclick="fnAddNode()" class="btn btn-sm btn-border me-1 ms-auto mb-2">
-                    <i class="fa-solid fa-plus me-1 text-success"></i>
-                    추가
-                </button>
+            <div class="row">
+                <div class="col">
+                    <button type="button" onclick="fnAddNode()" class="btn btn-sm btn-border me-1 mb-2">
+                        <i class="fa-solid fa-plus me-1 text-success"></i>
+                        추가
+                    </button>
+
+                    <button type="button" onclick="fnRenameNode('E')" class="btn btn-sm btn-border me-1 mb-2">
+                        <i class="fa-regular fa-pen-to-square me-1 text-warning"></i>
+                        수정
+                    </button>
+
+                    <button type="button" onclick="fnDeleteNode()" class="btn btn-sm btn-border me-1 mb-2">
+                        <i class="fa-solid fa-xmark me-1 text-danger"></i>
+                        삭제
+                    </button>
+                </div>
             </div>
 
             <hr />
@@ -118,11 +248,23 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h6>프로젝트 이름</h6>
+
+                <div role="button" onclick="javascript:history.go(-1)">
+                    <small>
+                        <i class="fa-solid fa-caret-left"></i>
+                        이전 페이지
+                    </small>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
 
+                <div>
+
+                    <h6>프로젝트 이름</h6>
+
+                </div>
+                <hr />
                 @* <div>
                     <h6>
                         프로젝트 진행률

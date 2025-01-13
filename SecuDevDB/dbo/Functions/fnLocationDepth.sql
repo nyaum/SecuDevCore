@@ -8,7 +8,8 @@ RETURNS @LocationDepth TABLE (
 		CustomerTypeName VARCHAR(500), 
 		MasterLocationID INT, 
 		MasterLocationName VARCHAR(500), 
-		Depth VARCHAR(MAX)
+		Depth VARCHAR(MAX),
+		Status INT
 )
 AS
 BEGIN
@@ -20,9 +21,10 @@ BEGIN
 			ParentLocationID,
 			MasterLocationID,
 			LocationName AS MasterLocationName,
-			CONVERT(VARCHAR(500), LocationName) AS Depth
+			CONVERT(VARCHAR(500), LocationName) AS Depth,
+			Status
 		FROM Location
-		WHERE ParentLocationID IS NULL
+		WHERE ParentLocationID IS NULL OR ParentLocationID = 0
 		UNION ALL
 		SELECT
 			l.LocationID,
@@ -30,7 +32,8 @@ BEGIN
 			l.ParentLocationID,
 			l.MasterLocationID,
 			l.LocationName AS MasterLocationName,
-			CONVERT(VARCHAR(500), CONVERT(VARCHAR, ct.Depth) + ' > ' + CONVERT(VARCHAR(500), l.LocationName))
+			CONVERT(VARCHAR(500), CONVERT(VARCHAR, ct.Depth) + ' > ' + CONVERT(VARCHAR(500), l.LocationName)),
+			l.Status
 		FROM Location l, CT ct
 		WHERE l.ParentLocationID = ct.LocationID
 	)
@@ -39,11 +42,11 @@ BEGIN
 	SELECT 
 		c.LocationID,
 		c.LocationName,
-		c.ParentLocationID,
+		IIF(c.ParentLocationID = 0, NULL, c.ParentLocationID ) AS ParentLocationID,
 		ct.CustomerTypeID, ct.CustomerTypeName,
 		ml.LocationID AS MasterLocationID, 
 		ml.LocationName AS MasterLocationName, 
-		Depth 
+		Depth, c.Status
 	FROM CT c 
 	INNER JOIN Location ml ON c.MasterLocationID = ml.LocationID
 	INNER JOIN CustomerType ct ON ct.CustomerTypeID = ml.CustomerTypeID

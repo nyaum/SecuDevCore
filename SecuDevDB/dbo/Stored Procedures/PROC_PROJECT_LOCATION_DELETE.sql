@@ -1,0 +1,14 @@
+﻿CREATE PROCEDURE PROC_PROJECT_LOCATION_DELETE
+	@LocationID INT = ''
+AS
+BEGIN
+
+	DECLARE @Rtn INT = -1
+
+	UPDATE Location SET Status = 1 WHERE LocationID = @LocationID
+
+	SET @Rtn = 1
+
+	RETURN @Rtn
+
+END

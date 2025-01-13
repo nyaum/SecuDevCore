@@ -14,6 +14,7 @@ using System;
 using System.Data;
 using System.Drawing.Printing;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 using X.PagedList.Extensions;
 
 namespace SecuDevCore.Controllers
@@ -153,6 +154,59 @@ namespace SecuDevCore.Controllers
             {
                 Rtn = -1;
             }
+
+            return Rtn;
+        }
+
+        [HttpPost]
+        public int CheckLocation(int LocationID)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+                {
+                    { "LocationID", LocationID },
+                };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_PROJECT_LOCATION_CHECK", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
+        }
+
+        [HttpPost]
+        public int WriteLocation(int id, int ParentLocationID, string name)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+                {
+                    { "LocationID", id },
+                    { "ParentLocationID", ParentLocationID },
+                    { "LocationName", name },
+                };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_PROJECT_LOCATION_WRITE", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
+        }
+
+        [HttpPost]
+        public int DeleteLocation(int LocationID) 
+        { 
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+                {
+                    { "LocationID", LocationID },
+                };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_PROJECT_LOCATION_DELETE", param);
+
+            Rtn = result.ReturnValue;
 
             return Rtn;
         }

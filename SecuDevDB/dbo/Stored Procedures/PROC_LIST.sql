@@ -73,6 +73,7 @@ BEGIN
 			LocationID,
 			LocationName as [text]
 		FROM dbo.fnLocationDepth()
+		WHERE Status = 0
 	END
 
 END
