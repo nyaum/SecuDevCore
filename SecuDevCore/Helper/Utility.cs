@@ -297,6 +297,30 @@ namespace SecuDev.Helper
             return list;
         }
 
+        public static List<Contact> GetContactList()
+        {
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+
+                { "Type", "Contact" }
+
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<Contact> list = new List<Contact>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                list.Add(i.ToObject<Contact>());
+
+            }
+
+            return list;
+        }
+
         /// <summary>
         /// 사용자 아이피 주소
         /// </summary>

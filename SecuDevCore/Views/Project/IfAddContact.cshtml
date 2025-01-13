@@ -1,0 +1,123 @@
+﻿@using SecuDev.Helper
+@using SecuDev.Models;
+@{
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+    List<Contact> contacts = ViewBag.Contact;
+}
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0-rc.4/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0-rc.4/dist/js/tom-select.complete.min.js"></script>
+<script>
+    $().ready(function () {
+
+        const opt = {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            render: {
+                option: function(data, escape) {
+                    return `<div class="row">
+                                <span class="title">${data.text}</span>
+                                <span class="grade text-secondary">${data.grade}</span>
+                                <span class="tel text-secondary">${data.tel}</span>
+                                <span class="email text-secondary">${data.email}</span>
+                            </div>`
+                }
+            }
+        }
+
+        Contact = new TomSelect("#Contact", opt) ;
+
+    })
+</script>
+<div>
+    <div class="">
+        <h6>업체 관계자</h6>
+        <select id="Contact" placeholder="업체 관계자 선택" multiple>
+            <option></option>
+            @{
+                foreach (var c in Utility.GetContactList())
+                {
+                    <option data-value="@c.ContactID" data-text="@c.ContactName" data-grade="@c.Grade" data-email="@c.Email" data-tel="@c.Tel" >@c.ContactName</option>
+                }
+            }
+        </select>
+    </div>
+
+    <hr />
+
+    <h6>업체 관계자 추가</h6>
+    <div class="d-flex">
+        <div class="flex-grow-1 me-4">
+            <small>이름</small>
+            <input type="text" class="form-control form-control-sm"/>
+        </div>
+        <div class="flex-grow-1 ms-4">
+            <small>직급</small>
+            <input type="text" class="form-control form-control-sm" />
+        </div>
+    </div>
+    <br />
+    <div class="d-flex">
+        <div class="flex-grow-1 me-4">
+            <small>연락처</small>
+            <input type="text" class="form-control form-control-sm" />
+        </div>
+        <div class="flex-grow-1 ms-4">
+            <small>이메일</small>
+            <input type="text" class="form-control form-control-sm" />
+        </div>
+    </div>
+
+    <hr />
+
+    <h6>업체 관계자</h6>
+    <ul class="list-group">
+    @{
+        if (contacts.Count > 0)
+        {
+
+            foreach (var c in contacts)
+            {
+                <li class="list-group-item">
+                    <div class="mb-1">
+                        <i class="fa-solid fa-star me-1"></i>
+                        <span class="">@c.ContactName</span>
+                    </div>
+                    <div class="mb-1">
+                        <i class="fa-solid fa-user-tag me-1"></i>
+                        <span class="">@c.Grade</span>
+                    </div>
+                    <div class="mb-1">
+                        <i class="fa-solid fa-phone me-1"></i>
+                        <span class="">@c.Tel</span>
+                    </div>
+                    <div class="mb-1">
+                        <i class="fa-solid fa-envelope me-1"></i>
+                        <span>
+                            <email class="email">@c.Email</email>
+                        </span>
+                    </div>
+                </li>
+            }
+        }
+        else
+        {
+            <li align="center" class="list-group-item">
+
+                <div class="py-5 text-secondary">
+                    <h1>
+                        <i class="fa-solid fa-users-slash"></i>
+                    </h1>
+
+                    <h6>
+                        <span>등록된 인원 없음</span>
+                    </h6>
+                </div>
+
+            </li>
+        }
+    }
+    </ul>
+</div>

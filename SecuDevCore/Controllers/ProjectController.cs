@@ -211,6 +211,29 @@ namespace SecuDevCore.Controllers
             return Rtn;
         }
 
+        public IActionResult IfAddContact(int LocationID)
+        {
+            List<Contact> contacts = new List<Contact>();
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "LocationID", LocationID }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            foreach (DataRow dr in ds.Tables[1].Rows)
+            {
+                Contact c = dr.ToObject<Contact>();
+                contacts.Add(c);
+            }
+
+            ViewBag.Contact = contacts;
+
+            return View();
+        }
         //public IActionResult IfDetail(int LocationID)
         //{
 
