@@ -9,71 +9,114 @@
 <script>
     $().ready(function () {
 
-        const opt = {
-            create: false,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            },
-            render: {
-                option: function(data, escape) {
-                    return `<div class="row">
-                                <span class="title">${data.text}</span>
-                                <span class="grade text-secondary">${data.grade}</span>
-                                <span class="tel text-secondary">${data.tel}</span>
-                                <span class="email text-secondary">${data.email}</span>
-                            </div>`
-                }
-            }
-        }
-
-        Contact = new TomSelect("#Contact", opt) ;
+        
 
     })
+
+    function fnAddContact() {
+
+        const ContactName = $("#ContactName").val()
+        const ContactGrade = $("#ContactGrade").val()
+        const ContactTel = $("#ContactTel").val()
+        const ContactEmail = $("#ContactEmail").val()
+
+        if (ContactName == '') {
+
+            alert("입력 값을 다시 확인해주세요.")
+
+            $("#ContactName").focus();
+
+            return
+        }
+
+        if (ContactGrade == '') {
+
+            alert("입력 값을 다시 확인해주세요.")
+
+            $("#ContactGrade").focus();
+
+            return
+        }
+
+        if (ContactTel == '') {
+
+            alert("입력 값을 다시 확인해주세요.")
+
+            $("#ContactTel").focus();
+
+            return
+        }
+
+        pattern = /^\b[A-Z0-9._%-]+@@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i;
+
+        if(!pattern.test(ContactEmail) || ContactEmail == '') {
+
+            alert("입력 값을 다시 확인해주세요.")
+
+            $("#ContactEmail").focus();
+
+            return
+        }
+
+        const html = `<li class="list-group-item">
+                        <div class="mb-1">
+                            <i class="fa-solid fa-star me-1"></i>
+                            <span class="">${ContactName}</span>
+                        </div>
+                        <div class="mb-1">
+                            <i class="fa-solid fa-user-tag me-1"></i>
+                            <span class="">${ContactGrade}</span>
+                        </div>
+                        <div class="mb-1">
+                            <i class="fa-solid fa-phone me-1"></i>
+                            <span class="">${ContactTel}</span>
+                        </div>
+                        <div class="mb-1">
+                            <i class="fa-solid fa-envelope me-1"></i>
+                            <span>
+                                <email class="email">${ContactEmail}</email>
+                            </span>
+                        </div>
+                    </li>`;
+
+        
+
+        $("#Contact-list").append(html)
+        
+
+    }
 </script>
 <div>
-    <div class="">
-        <h6>업체 관계자</h6>
-        <select id="Contact" placeholder="업체 관계자 선택" multiple>
-            <option></option>
-            @{
-                foreach (var c in Utility.GetContactList())
-                {
-                    <option data-value="@c.ContactID" data-text="@c.ContactName" data-grade="@c.Grade" data-email="@c.Email" data-tel="@c.Tel" >@c.ContactName</option>
-                }
-            }
-        </select>
-    </div>
-
-    <hr />
 
     <h6>업체 관계자 추가</h6>
+
     <div class="d-flex">
         <div class="flex-grow-1 me-4">
             <small>이름</small>
-            <input type="text" class="form-control form-control-sm"/>
+            <input type="text" id="ContactName" class="form-control form-control-sm" placeholder="업체 관계자 이름 입력" required />
         </div>
-        <div class="flex-grow-1 ms-4">
+        <div class="flex-grow-1 me-4">
             <small>직급</small>
-            <input type="text" class="form-control form-control-sm" />
+            <input type="text" id="ContactGrade" class="form-control form-control-sm" placeholder="업체 관계자 직급 입력" required />
         </div>
-    </div>
-    <br />
-    <div class="d-flex">
         <div class="flex-grow-1 me-4">
             <small>연락처</small>
-            <input type="text" class="form-control form-control-sm" />
+            <input type="text" id="ContactTel" class="form-control form-control-sm" placeholder="업체 관계자 연락처 입력" required />
         </div>
-        <div class="flex-grow-1 ms-4">
+        <div class="flex-grow-1">
             <small>이메일</small>
-            <input type="text" class="form-control form-control-sm" />
+            <input type="text" id="ContactEmail" class="form-control form-control-sm" placeholder="업체 관계자 이메일 입력" required />
         </div>
     </div>
+
+    <br />
+
+    <button type="button" class="w-100 btn btn-border" onclick="javascript:fnAddContact()">추가</button>
 
     <hr />
 
     <h6>업체 관계자</h6>
-    <ul class="list-group">
+    <ul id="Contact-list" class="list-group">
     @{
         if (contacts.Count > 0)
         {
