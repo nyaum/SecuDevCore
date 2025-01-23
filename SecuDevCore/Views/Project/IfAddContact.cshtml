@@ -3,6 +3,7 @@
 @{
     Layout = "~/Views/Shared/_PopLayout.cshtml";
     List<Contact> contacts = ViewBag.Contact;
+	int LocationID = ViewBag.LocationID;
 }
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0-rc.4/dist/css/tom-select.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0-rc.4/dist/js/tom-select.complete.min.js"></script>
@@ -57,32 +58,104 @@
 
             return
         }
-
-        const html = `<li class="list-group-item">
-                        <div class="mb-1">
-                            <i class="fa-solid fa-star me-1"></i>
-                            <span class="">${ContactName}</span>
-                        </div>
-                        <div class="mb-1">
-                            <i class="fa-solid fa-user-tag me-1"></i>
-                            <span class="">${ContactGrade}</span>
-                        </div>
-                        <div class="mb-1">
-                            <i class="fa-solid fa-phone me-1"></i>
-                            <span class="">${ContactTel}</span>
-                        </div>
-                        <div class="mb-1">
-                            <i class="fa-solid fa-envelope me-1"></i>
-                            <span>
-                                <email class="email">${ContactEmail}</email>
-                            </span>
-                        </div>
-                    </li>`;
-
         
+        $.ajax({
+            type: "POST",
+            url: "/Project/AddContact",
+            data: {
+                LocationID:@LocationID,
+                ContactName:ContactName,
+                ContactGrade:ContactGrade,
+                ContactTel:ContactTel,
+                ContactEmail:ContactEmail
+            },
+            success: function(data){
 
-        $("#Contact-list").append(html)
+                if (data == 0) {
+                    alert("처리중 오류가 발생했습니다.")
+                }
+                else if (data == -1)
+                {
+                    alert("처리중 오류가 발생했습니다.")
+                }
+                else if (data == -2) 
+                {
+                    alert("이미 등록되어있습니다.")
+                }
+                else {
+
+                    const html = `<li class="list-group-item">
+                                    <div class="d-flex">
+                                        <div>
+                                            <div class="mb-1">
+                                                <i class="fa-solid fa-star me-1"></i>
+                                                <span class="">${ContactName}</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <i class="fa-solid fa-user-tag me-1"></i>
+                                                <span class="">${ContactGrade}</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <i class="fa-solid fa-phone me-1"></i>
+                                                <span class="">${ContactTel}</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <i class="fa-solid fa-envelope me-1"></i>
+                                                <span>
+                                                    <email class="email">${ContactEmail}</email>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="ms-auto">
+                                            <div role="button" onclick="javascript:fnRemoveContact(${data})">
+                                                <i class="fa-solid fa-minus text-danger fs-4"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>`;
+
+                    $("#Contact-list").append(html)
+
+                    $("#ContactName").val('')
+                    $("#ContactGrade").val('')
+                    $("#ContactTel").val('')
+                    $("#ContactEmail").val('')
+
+                    alert("정상 처리되었습니다.")
+
+                }
+
+            }
+
+        })
         
+    }
+
+    function fnRemoveContact(id) {
+
+        $.ajax({
+            type: "POST",
+            url: "/Project/RemoveContact",
+            data: {
+                ContactID : id,
+                LocationID : @LocationID
+            },
+            success: function(data){
+
+                if (data == 0) {
+                    alert("처리중 오류가 발생했습니다.")
+                }
+                else {                                                                                                                                                                                                                  
+
+                    parent.changeIframeUrl('/Project/IfAddContact?LocationID=@LocationID')
+
+                    alert("정상 처리되었습니다.")
+
+                }
+
+            }
+        
+        })
 
     }
 </script>
@@ -116,7 +189,7 @@
     <hr />
 
     <h6>업체 관계자</h6>
-    <ul id="Contact-list" class="list-group">
+    <ul id="Contact-list" class="list-group list-group-flush border rounded" style="max-height:65vh;">
     @{
         if (contacts.Count > 0)
         {
@@ -124,43 +197,52 @@
             foreach (var c in contacts)
             {
                 <li class="list-group-item">
-                    <div class="mb-1">
-                        <i class="fa-solid fa-star me-1"></i>
-                        <span class="">@c.ContactName</span>
-                    </div>
-                    <div class="mb-1">
-                        <i class="fa-solid fa-user-tag me-1"></i>
-                        <span class="">@c.Grade</span>
-                    </div>
-                    <div class="mb-1">
-                        <i class="fa-solid fa-phone me-1"></i>
-                        <span class="">@c.Tel</span>
-                    </div>
-                    <div class="mb-1">
-                        <i class="fa-solid fa-envelope me-1"></i>
-                        <span>
-                            <email class="email">@c.Email</email>
-                        </span>
+                    <div class="d-flex">
+                        <div>
+                            <div class="mb-1">
+                                <i class="fa-solid fa-star me-1"></i>
+                                <span class="">@c.ContactName</span>
+                            </div>
+                            <div class="mb-1">
+                                <i class="fa-solid fa-user-tag me-1"></i>
+                                <span class="">@c.Grade</span>
+                            </div>
+                            <div class="mb-1">
+                                <i class="fa-solid fa-phone me-1"></i>
+                                <span class="">@c.Tel</span>
+                            </div>
+                            <div class="mb-1">
+                                <i class="fa-solid fa-envelope me-1"></i>
+                                <span>
+                                    <email class="email">@c.Email</email>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ms-auto">
+                            <div role="button" onclick="javascript:fnRemoveContact(@c.ContactID)">
+                                <i class="fa-solid fa-minus text-danger fs-4"></i>
+                            </div>
+                        </div>
                     </div>
                 </li>
             }
         }
-        else
-        {
-            <li align="center" class="list-group-item">
+        // else
+        // {
+        //     <li align="center" class="list-group-item">
 
-                <div class="py-5 text-secondary">
-                    <h1>
-                        <i class="fa-solid fa-users-slash"></i>
-                    </h1>
+        //         <div class="py-5 text-secondary">
+        //             <h1>
+        //                 <i class="fa-solid fa-users-slash"></i>
+        //             </h1>
 
-                    <h6>
-                        <span>등록된 인원 없음</span>
-                    </h6>
-                </div>
+        //             <h6>
+        //                 <span>등록된 인원 없음</span>
+        //             </h6>
+        //         </div>
 
-            </li>
-        }
+        //     </li>
+        // }
     }
     </ul>
 </div>

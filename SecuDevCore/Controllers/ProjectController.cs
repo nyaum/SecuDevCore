@@ -230,10 +230,68 @@ namespace SecuDevCore.Controllers
                 contacts.Add(c);
             }
 
+            ViewBag.LocationID = LocationID;
             ViewBag.Contact = contacts;
 
             return View();
         }
+
+        [HttpPost]
+        public int AddContact(int LocationID, string ContactName, string ContactGrade, string ContactTel, string ContactEmail)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "LocationID", LocationID },
+                { "ContactName", ContactName },
+                { "Grade", ContactGrade },
+                { "Tel", ContactTel },
+                { "Email", ContactEmail }
+            };
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_CONTACT_WRITE", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
+        }
+
+        [HttpPost]
+        public int RemoveContact(int ContactID, int LocationID)
+        {
+            int Rtn = -1;
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "ContactID", ContactID },
+                { "LocationID", LocationID }
+            };
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_CONTACT_DELETE", param);
+            Rtn = result.ReturnValue;
+            return Rtn;
+        }
+
+        public IActionResult IfReadHistory(int ProjectID)
+        {
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "ProjectID", ProjectID }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_READ", param);
+
+            DataSet ds = result.DataSet;
+
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                Project p = ds.Tables[0].Rows[0].ToObject<Project>();
+
+                ViewBag.Project = p;
+            }
+
+            return View();
+        }
+
         //public IActionResult IfDetail(int LocationID)
         //{
 
