@@ -18,6 +18,7 @@
 
         const ContactName = $("#ContactName").val()
         const ContactGrade = $("#ContactGrade").val()
+        const ContactCompany = $("#ContactCompany").val()
         const ContactTel = $("#ContactTel").val()
         const ContactEmail = $("#ContactEmail").val()
 
@@ -35,6 +36,15 @@
             alert("입력 값을 다시 확인해주세요.")
 
             $("#ContactGrade").focus();
+
+            return
+        }
+
+        if (ContactCompany == '') {
+
+            alert("입력 값을 다시 확인해주세요.")
+
+            $("#ContactCompany").focus();
 
             return
         }
@@ -66,6 +76,7 @@
                 LocationID:@LocationID,
                 ContactName:ContactName,
                 ContactGrade:ContactGrade,
+                ContactCompany:ContactCompany,
                 ContactTel:ContactTel,
                 ContactEmail:ContactEmail
             },
@@ -96,6 +107,10 @@
                                                 <span class="">${ContactGrade}</span>
                                             </div>
                                             <div class="mb-1">
+                                                <i class="fa-solid fa-building me-1"></i>
+                                                <span class="">${ContactCompany}</span>
+                                            </div>
+                                            <div class="mb-1">
                                                 <i class="fa-solid fa-phone me-1"></i>
                                                 <span class="">${ContactTel}</span>
                                             </div>
@@ -118,6 +133,7 @@
 
                     $("#ContactName").val('')
                     $("#ContactGrade").val('')
+                    $("#ContactCompany").val('')
                     $("#ContactTel").val('')
                     $("#ContactEmail").val('')
 
@@ -173,6 +189,10 @@
             <input type="text" id="ContactGrade" class="form-control form-control-sm" placeholder="업체 관계자 직급 입력" required />
         </div>
         <div class="flex-grow-1 me-4">
+            <small>소속</small>
+            <input type="text" id="ContactCompany" class="form-control form-control-sm" placeholder="업체 관계자 소속 입력" required />
+        </div>
+        <div class="flex-grow-1 me-4">
             <small>연락처</small>
             <input type="text" id="ContactTel" class="form-control form-control-sm" placeholder="업체 관계자 연락처 입력" required />
         </div>
@@ -206,6 +226,10 @@
                             <div class="mb-1">
                                 <i class="fa-solid fa-user-tag me-1"></i>
                                 <span class="">@c.Grade</span>
+                            </div>
+                            <div class="mb-1">
+                                <i class="fa-solid fa-building me-1"></i>
+                                <span class="">@c.Company</span>
                             </div>
                             <div class="mb-1">
                                 <i class="fa-solid fa-phone me-1"></i>

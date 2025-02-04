@@ -12,6 +12,7 @@ namespace SecuDev.Models
         public int MasterLocationID { get; set; }
         public string LocationName { get; set; }
         public int ParentLocationID { get; set; }
+        public string Note { get; set; }
         public string InsertDate {  get; set; }
 
     }

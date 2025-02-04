@@ -237,7 +237,7 @@ namespace SecuDevCore.Controllers
         }
 
         [HttpPost]
-        public int AddContact(int LocationID, string ContactName, string ContactGrade, string ContactTel, string ContactEmail)
+        public int AddContact(int LocationID, string ContactName, string ContactGrade, string ContactCompany, string ContactTel, string ContactEmail)
         {
             int Rtn = -1;
 
@@ -246,6 +246,7 @@ namespace SecuDevCore.Controllers
                 { "LocationID", LocationID },
                 { "ContactName", ContactName },
                 { "Grade", ContactGrade },
+                { "Company", ContactCompany },
                 { "Tel", ContactTel },
                 { "Email", ContactEmail }
             };
@@ -290,6 +291,43 @@ namespace SecuDevCore.Controllers
             }
 
             return View();
+        }
+
+        [HttpPost]
+        public string GetLocationNote(int LocationID)
+        {
+            string Rtn = "";
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "LocationID", LocationID }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LOCATION_READ", param);
+
+            DataSet ds = result.DataSet;
+
+            Rtn = ds.Tables[0].Rows[0]["Note"].ToString();
+
+            return Rtn;
+        }
+
+        [HttpPost]
+        public int EditNote(int LocationID, string Note)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "LocationID", LocationID },
+                { "Note", Note }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_NOTE_UPDATE", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
         }
 
         //public IActionResult IfDetail(int LocationID)

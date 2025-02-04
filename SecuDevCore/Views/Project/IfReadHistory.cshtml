@@ -1,5 +1,97 @@
 ﻿@using SecuDev.Models
 @{
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
 	Project p = ViewBag.Project;
 }
 
+<style>
+    body {
+        overflow-x:hidden;
+    }
+</style>
+<script>
+    $().ready(function(){
+        let FileName = `@p.FileName`.split('|');
+        let uniqueFileId = `@p.UUID`.split('|');
+
+        let FileHtml = '';
+
+        if (FileName[0] != '') {
+
+            for (var i = 0; i < FileName.length; i++) {
+
+                if (i == 0) {
+
+                    FileHtml = '<a class="link-dark" href="/Board/Download?FileName=' + FileName[i] + '&uniqueFileId=' + uniqueFileId[i] + '">' + FileName[i] + '</a>';
+
+                }
+                else {
+
+                    FileHtml = '<a class="link-dark ps-2" href="/Board/Download?FileName=' + FileName[i] + '&uniqueFileId=' + uniqueFileId[i] + '">' + FileName[i] + '</a>';
+
+                }
+
+                $("#fileArea").append(FileHtml);
+
+            }
+        }
+        else {
+            $("#fileArea").text("첨부파일 없음")
+        }
+    })
+</script>
+<div>
+
+    <div class="row">
+
+        <div class="col">
+            <h6>작업 소프트웨어</h6>
+            <span>@p.SoftwareName</span>
+        </div>
+        <div class="col">
+
+            <h6>작업 분류</h6>
+            <span>@p.InstallTypeName</span>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+
+        <div class="col">
+
+            <h6>작업자</h6>
+            <span>@p.UserName</span>
+
+        </div>
+
+        <div class="col">
+            <h6>버전 정보</h6>
+            <span>@p.Version</span>
+        </div>
+
+    </div>
+
+	<hr />
+
+	<h6>작업 내용</h6>
+
+    <div>
+
+        <hr />
+        <div class="px-2">
+            <i class="fa-solid fa-file-arrow-down pe-2"></i>
+            <span id="fileArea">
+
+            </span>
+        </div>
+    </div>
+
+    <hr />
+
+    <div id="Content" class="border rounded-1 p-4 bg-white">
+        @p.Content
+    </div>
+
+</div>

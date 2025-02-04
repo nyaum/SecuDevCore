@@ -17,6 +17,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 
+<style>
+    #EditField:focus-visible{
+        outline:none;
+    }
+</style>
+
 <script>
 
     $().ready(function(){
@@ -45,7 +51,7 @@
             
             if (node.children.length == 0) {
 
-                fnOpenModal(node.id)
+                fnOpenModal(node.id, node.text)
 
             }
 
@@ -75,9 +81,23 @@
         document.getElementById("IfProject").src = url;
     }
 
-    function fnOpenModal(LocationID) {
+    function fnOpenModal(LocationID, LocationName) {
 
         $("#IfProject").attr("src", "/Project/IfRead?LocationID=" + LocationID);
+        $("#LocationName").text(LocationName)
+
+        $.ajax({
+            type:"POST",
+            url: "/Project/GetLocationNote",
+            data: {LocationID:LocationID},
+            success: function(data){
+
+                $("#Note").text(data)
+                $("#EditField").val(data)
+                $("#EditNote").attr("data-sd-id", LocationID);
+
+            }
+        })
 
         $("#proj").modal('show')
     }
@@ -204,6 +224,40 @@
 
         }
     }
+
+    function fnEditNote() {
+
+        const LocationID = $("#EditNote").attr("data-sd-id");
+
+        $("#EditField").attr("disabled", false);
+
+        $("#EditNote .fa-pen").addClass("d-none")
+        $("#EditNote .fa-check").removeClass("d-none")
+
+        $("#EditField").focus();
+
+    }
+
+    function fnConfirmNote() {
+        
+        const LocationID = $("#EditNote").attr("data-sd-id");
+		const Note = $("#EditField").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/Project/EditNote",
+            data: { LocationID : LocationID, Note : Note },
+            success:function(data){
+
+                $("#EditNote .fa-pen").removeClass("d-none")
+                $("#EditNote .fa-check").addClass("d-none")
+
+                $("#EditField").attr("disabled", true);
+
+            }
+        })
+
+    }
 </script>
 
 <div>
@@ -259,23 +313,26 @@
             </div>
             <div class="modal-body">
 
-                <div>
+                <div class="row align-items-center justify-content-center">
 
-                    <h6>프로젝트 이름</h6>
+                    <h6 id="LocationName" class="col m-0">프로젝트 이름</h6>
+
+                    <span class="text-secondary col d-flex">
+
+                        @* <small id="Note" class="flex-grow-1 me-3 text-end">GitAddress</small> *@
+                        <input id="EditField" type="text" class="flex-grow-1 border-0 border-bottom bg-transparent" disabled="" />
+
+                        <small id="EditNote" class="mx-2" data-sd-id="" >
+                            <i class="fa-solid fa-pen" role="button" onclick="javascript:fnEditNote();"></i>
+                            <i class="fa-solid fa-check d-none" role="button" onclick="javascript:fnConfirmNote();"></i>
+                        </small>
+
+                    </span>
+                    
 
                 </div>
+
                 <hr />
-                @* <div>
-                    <h6>
-                        프로젝트 진행률
-                        <small class="float-end">프로젝트 진행중...</small>
-                    </h6>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-dark" style="width:70%">70%</div>
-                    </div>
-                </div>
-
-                <hr /> *@
 
                 <iframe id="IfProject">
 

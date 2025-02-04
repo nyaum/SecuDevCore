@@ -10,6 +10,7 @@ namespace SecuDev.Models
         public string InstallTypeName { get; set; }
         public string UserName { get; set; }
         public string Content { get; set; }
+        public string Version { get; set; }
         public string UUID { get; set; }
         public string FileName { get; set; }
         public string _InstallDate { get; set; }
