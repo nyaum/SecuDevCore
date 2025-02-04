@@ -24,6 +24,7 @@ BEGIN
 		ContactID,
 		ContactName, 
 		Grade,
+		Company,
 		Tel,
 		Email
 	FROM Contact c

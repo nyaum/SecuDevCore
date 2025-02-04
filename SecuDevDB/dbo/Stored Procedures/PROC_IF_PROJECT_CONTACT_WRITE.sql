@@ -2,6 +2,7 @@
 	@LocationID INT = '',
 	@ContactName VARCHAR(500) = '',
 	@Grade VARCHAR(500) = '',
+	@Company VARCHAR(500) = '',
 	@Tel VARCHAR(500) = '',
 	@Email VARCHAR(500) = ''
 AS
@@ -16,11 +17,13 @@ BEGIN
 		INSERT INTO Contact (
 			ContactName,
 			Grade,
+			Company,
 			Tel,
 			Email
 		) VALUES (
 			@ContactName,
 			@Grade,
+			@Company,
 			@Tel,
 			@Email
 		)

@@ -1,0 +1,6 @@
+﻿CREATE PROCEDURE PROC_LOCATION_READ
+	@LocationID INT = ''
+AS
+BEGIN
+	SELECT * FROM Location WHERE LocationID = @LocationID
+END
