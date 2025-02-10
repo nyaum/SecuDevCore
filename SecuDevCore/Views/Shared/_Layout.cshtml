@@ -5,6 +5,7 @@
     HttpContextAccessor _Ac = new HttpContextAccessor();
 
     string UserName = _Ac.HttpContext.Session.GetString("UserName");
+    string UID = _Ac.HttpContext.Session.GetString("UID");
     int AuthorityLevel = Int32.Parse(_Ac.HttpContext.Session.GetString("AuthorityLevel"));
 }
 <!DOCTYPE html>
@@ -81,7 +82,200 @@
 
             }
 
+            // 모달 dismiss evt
+            $("#user-manage").on("hidden.bs.modal", function () {
+
+                $("#modify").attr("checked", false);
+
+                $("input[name='UserName']").val("")
+
+                $("input[name='UID']").val("")
+                $("input[name='UID']").attr("disabled", false)
+                $("#Duplicate_check").attr("disabled", false)
+
+                $("input[name='Email']").val("")
+
+                $("#AuthorityName").text("사용자 레벨")
+                $("#AuthorityName").attr("data-value", "")
+                $("#AuthorityLevel").val("")
+            });
+
+
         })
+
+        // 비밀번호 일치 확인
+        function fnMatchPassword() {
+
+            var Password = $("input[name='Password']").val()
+            var RePassword = $("input[name='re-Password']").val()
+
+            var Msg = "";
+            var FontClass = "";
+
+            if (Password != "" && RePassword != "") {
+
+                if (Password == RePassword) {
+                    Msg = "비밀번호가 일치합니다."
+                    FontClass = "text-success"
+
+                    $("input[name='Match']").attr("checked", true);
+                }
+                else {
+                    Msg = "비밀번호가 일치하지 않습니다."
+                    FontClass = "text-danger"
+
+                    $("input[name='Match']").attr("checked", false);
+                }
+
+                $("#Password_alert").text(Msg);
+                $("#Password_alert").removeClass("d-none");
+
+                $("#Password_alert").removeClass(function(index, className){
+                    return (className.match(/(^|\s)text-\S+/g) || []).join(' ');
+                });
+
+                $("#Password_alert").addClass(FontClass);
+
+            }
+            else {
+                $("#Password_alert").addClass("d-none");
+            }
+
+        }
+
+        // 사용자 등록 함수
+        function fnConfirm() {
+
+            const UserName = $("input[name='UserName']").val();
+            const UID = $("input[name='UID']").val();
+            const Password = $("input[name='Password']").val();
+            const Email = $("input[name='Email']").val();
+
+            const Duplicate = $("input[name='Duplicate']").is(":checked");
+            const PasswordMatch = $("input[name='Match']").is(":checked");
+
+
+            const Modify = $("#modify").is(":checked");
+
+            if (UserName == "") {
+
+                return;
+            }
+
+            if (UID == "") {
+
+                return;
+            }
+
+            if (Password == "" && Modify === false) {
+
+                return;
+            }
+
+            // 사용자 등록일때
+            if ( Modify === false ) {
+
+                if (Duplicate === false ) {
+
+                    alert ("아이디를 확인 후 다시 입력해주세요.")
+
+                    return;
+                }
+
+                if( PasswordMatch === false) {
+
+                    alert("비밀번호가 서로 일치하지 않습니다.")
+
+                    return;
+                }
+
+            }
+
+            // 사용자 수정일때
+            if ( Modify === true ) {
+
+                if ( Password.length > 0 ) {
+
+                    if ( PasswordMatch === false ) {
+
+                        alert("비밀번호가 서로 일치하지 않습니다.")
+
+                        return;
+                    }
+
+                }
+
+            }
+
+            const param = "UserName=" + UserName +
+                          "&UID=" + UID +
+                          "&Password=" + Password +
+                          "&Email=" + Email +
+                          "&AuthorityLevel=" + @AuthorityLevel +
+                          "&Modify=" + Modify;
+
+            $.ajax({
+                type:"POST",
+                url:"/UserConfig/Write",
+                data:param,
+                success:function(data){
+
+                    if (data == 0) {
+                        alert ("입력값을 다시 확인해주세요.")
+
+                        return;
+                    }
+
+                    if (data == -1) {
+                        alert ("등록 중 오류가 발생했습니다.")
+
+                        return;
+                    }
+
+                    if (data == 1 ) {
+
+                        alert ("정상 등록되었습니다.")
+
+                        location.href = "/Home/Main"
+
+                    }
+
+                }
+            })
+
+        }
+
+        function fnEdit(UID) {
+
+            $.ajax({
+                type:"POST",
+                url: "/UserConfig/GetUserInfo",
+                data: { "UID" : UID },
+                success: function(data){
+
+                    $("#modify").attr("checked", true);
+
+                    const UserName = data.userName;
+                    $("input[name='UserName']").val(UserName)
+
+                    const UID = data.uid;
+                    $("input[name='UID']").val(UID)
+                    $("input[name='UID']").attr("disabled", true)
+                    $("#Duplicate_check").attr("disabled", true)
+
+                    const Email = data.email;
+                    $("input[name='Email']").val(Email)
+
+                    const AuthorityName = data["authority"].authorityName;
+                    $("#AuthorityName").text(AuthorityName)
+
+                    $("#user-manage").modal("show")
+
+                }
+
+            })
+
+        }
     </script>
 
 </head>
@@ -96,8 +290,9 @@
 
             <div class="d-flex card bg-secondary">
                 <div class="card-body">
-                    <span class="text-white">
-                        @UserName
+                    <span class="text-white" role="button" onclick="javascript:fnEdit('@UID')">
+                        @UserName 
+                        <small><i class="ms-2 fa-solid fa-pen"></i></small>
                         <a href="/" class="text-white float-end"><i class="fa-solid fa-right-from-bracket"></i></a>
                     </span>
                 </div>
@@ -111,6 +306,15 @@
                     <span class="d-flex align-items-center justify-content-center">
                         <i class="fa-solid fa-list-check pe-3"></i>
                         프로젝트
+                        <i class="fa-solid fa-chevron-right ms-auto"></i>
+                    </span>
+                </li>
+
+                <li role="button" class="list-group-item bg-transparent border-0 text-white py-3" href="/Schedule">
+
+                    <span class="d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-calendar-days pe-3"></i>
+                        일정 관리
                         <i class="fa-solid fa-chevron-right ms-auto"></i>
                     </span>
                 </li>
@@ -168,9 +372,9 @@
                     <i class="fa-solid fa-bars"></i>
                 </a>
                 <span class="ms-3 fw-bold">SECUIDEA</span>
-                <button class="btn btn-sm btn-secondary ms-auto" data-bs-toggle="offcanvas" data-bs-target="#alarm">
-                    <i class="fa-regular fa-bell px-1"></i>
-                </button>
+                @* <button class="btn btn-sm btn-secondary ms-auto" data-bs-toggle="offcanvas" data-bs-target="#alarm"> *@
+                @*     <i class="fa-regular fa-bell px-1"></i> *@
+                @* </button> *@
             </div>
             <div class="p-4 mh-100">
 
@@ -197,77 +401,133 @@
     </div>
 
     <!-- Alarm -->
-    <div class="position-absolute bottom-0 end-0 offcanvas-lg translate-middle-x pb-5">
-        <div role="button" class="d-flex card bg-light rounded-5 shadow-sm" data-bs-toggle="offcanvas" data-bs-target="#alarm" style="--bs-border-radius-xxl: 5rem;">
-            <span class="text-secondary p-4">
-                <i class="fa-regular fa-bell px-1"></i>
-            </span>
+    @* <div class="position-absolute bottom-0 end-0 offcanvas-lg translate-middle-x pb-5"> *@
+    @*     <div role="button" class="d-flex card bg-light rounded-5 shadow-sm" data-bs-toggle="offcanvas" data-bs-target="#alarm" style="--bs-border-radius-xxl: 5rem;"> *@
+    @*         <span class="text-secondary p-4"> *@
+    @*             <i class="fa-regular fa-bell px-1"></i> *@
+    @*         </span> *@
+    @*     </div> *@
+    @* </div> *@
+
+    @* <div class="offcanvas offcanvas-end" id="alarm"> *@
+    @*     <div class="offcanvas-header border-bottom"> *@
+    @*         <h3 class="offcanvas-title">알림</h3> *@
+    @*         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button> *@
+    @*     </div> *@
+    @*     <div class="offcanvas-body"> *@
+
+    @*         <div class="card mb-2"> *@
+    @*             <div class="card-body p-1"> *@
+    @*                 <span class="d-flex align-items-center justify-content-center border-bottom p-2"> *@
+    @*                     게시글 멘션 알림 *@
+    @*                     <i class="fa-solid fa-chevron-right ms-auto"></i> *@
+    @*                 </span> *@
+
+    @*                 <div class="p-2"> *@
+    @*                     알림 내용 *@
+    @*                 </div> *@
+
+    @*                 <div> *@
+    @*                     <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*         </div> *@
+
+    @*         <div class="card mb-2"> *@
+    @*             <div class="card-body p-1"> *@
+    @*                 <span class="d-flex align-items-center justify-content-center border-bottom p-2"> *@
+    @*                     새 프로젝트 등록 *@
+    @*                     <i class="fa-solid fa-chevron-right ms-auto"></i> *@
+    @*                 </span> *@
+
+
+    @*                 <div class="p-2"> *@
+    @*                     알림 내용 *@
+    @*                 </div> *@
+
+    @*                 <div> *@
+    @*                     <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*         </div> *@
+
+    @*         <div class="card mb-2"> *@
+    @*             <div class="card-body p-1"> *@
+    @*                 <span class="d-flex align-items-center justify-content-center border-bottom p-2"> *@
+    @*                     알림 제목 *@
+    @*                     <i class="fa-solid fa-chevron-right ms-auto"></i> *@
+    @*                 </span> *@
+
+
+    @*                 <div class="p-2"> *@
+    @*                     알림 내용 *@
+    @*                 </div> *@
+    @*                 <div> *@
+    @*                     <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*         </div> *@
+
+    @*     </div> *@
+    @* </div> *@
+
+    <div id="user-manage" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <big class="fw-bold">사용자 추가</big>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control mb-3 border-secondary" name="UserName" placeholder="사용자 이름" />
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control border-secondary" name="UID" placeholder="아이디" oninput="fnValidation(this)" autocomplete="off" />
+                            <button type="button" id="Duplicate_check" class="btn btn-light border-secondary" onclick="javascript:fnCheckUID()">중복확인</button>
+                        </div>
+                        <span id="Duplicate_alert" class="ms-1 d-none"></span>
+                        <input type="checkbox" name="Duplicate" class="d-none" />
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="password" class="form-control mb-3 border-secondary" name="Password" placeholder="비밀번호" propertychange="fnMatchPassword" />
+
+                        <input type="password" class="form-control border-secondary" name="re-Password" placeholder="비밀번호 다시 입력" propertychange="fnMatchPassword" />
+                        <span id="Password_alert" class="ms-1 d-none"></span>
+                        <input type="checkbox" name="Match" class="d-none" />
+                    </div>
+
+                    <hr />
+
+                    <input type="text" class="form-control mb-3 border-secondary" name="Email" placeholder="이메일" />
+
+                    @* <hr /> *@
+
+                    @* <button type="button" class="btn btn-light dropdown-toggle border-secondary" data-bs-toggle="dropdown" changeable="true"> *@
+                    @*     <span id="AuthorityName" class="px-1" data-value="" name="AuthorityName">사용자 레벨</span> *@
+                    @* </button> *@
+                    @* <ul class="dropdown-menu" style="--bs-dropdown-link-active-bg: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity)) !important "> *@
+                    @*     @{ *@
+                    @*         foreach (var u in Utility.GetAuthorityList()) *@
+                    @*         { *@
+                    @*             <li role="button" data-value="@u.AuthorityLevel"> *@
+                    @*                 <a class="dropdown-item">@u.AuthorityName</a> *@
+                    @*             </li> *@
+                    @*         } *@
+                    @*     } *@
+                    @* </ul> *@
+                    @* <input type="hidden" id="AuthorityLevel" /> *@
+                </div>
+                <div class="modal-footer">
+                    <input type="checkbox" id="modify" class="d-none" />
+                    <button type="button" class="btn btn-light border-secondary" onclick="javascript:fnConfirm();">완료</button>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="offcanvas offcanvas-end" id="alarm">
-        <div class="offcanvas-header border-bottom">
-            <h3 class="offcanvas-title">알림</h3>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-
-            <div class="card mb-2">
-                <div class="card-body p-1">
-                    <span class="d-flex align-items-center justify-content-center border-bottom p-2">
-                        게시글 멘션 알림
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
-                    </span>
-
-                    <div class="p-2">
-                        알림 내용
-                    </div>
-
-                    <div>
-                        <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-2">
-                <div class="card-body p-1">
-                    <span class="d-flex align-items-center justify-content-center border-bottom p-2">
-                        새 프로젝트 등록
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
-                    </span>
-
-
-                    <div class="p-2">
-                        알림 내용
-                    </div>
-
-                    <div>
-                        <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-2">
-                <div class="card-body p-1">
-                    <span class="d-flex align-items-center justify-content-center border-bottom p-2">
-                        알림 제목
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
-                    </span>
-
-
-                    <div class="p-2">
-                        알림 내용
-                    </div>
-                    <div>
-                        <small class="text-secondary float-end" style="font-size:12px;">@Utility.DateTimeFormat("2024-12-10 13:00:00", 9)</small>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-
 
     @*<div class="container body-content">
 
