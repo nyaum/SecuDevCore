@@ -85,6 +85,7 @@
 
         $("#IfProject").attr("src", "/Project/IfRead?LocationID=" + LocationID);
         $("#LocationName").text(LocationName)
+        $("#LocationName").attr("data-id", LocationID);
 
         $.ajax({
             type:"POST",
@@ -257,6 +258,10 @@
             }
         })
 
+    }
+
+    function fnGetLocationID() {
+        return $("#LocationName").attr("data-id");
     }
 </script>
 

@@ -39,6 +39,34 @@
             $("#fileArea").text("첨부파일 없음")
         }
     })
+
+    function fnDeleteHistory(ProjectID){
+
+        const LocationID = parent.fnGetLocationID();
+
+        if(confirm("해당 이력을 삭제하시겠습니까?")){
+            $.ajax({
+                type: 'POST',
+                url: '/Project/DeleteHistory',
+                data: {ProjectID : ProjectID},
+                success: function(data){
+                    
+                    if (data == 1) 
+                    {
+                        alert("정상 처리 되었습니다.")
+
+                        parent.changeIframeUrl("/Project/IfRead?LocationID=" + LocationID);
+
+                    }
+                    else
+                    {
+                        alert("처리중 오류가 발생했습니다.")
+                    }
+
+                }
+            })
+        }
+    }
 </script>
 <div>
 
@@ -92,6 +120,15 @@
 
     <div id="Content" class="border rounded-1 p-4 bg-white">
         @p.Content
+    </div>
+
+    <hr />
+
+    <div>
+        <button class="btn btn-border float-end" onclick="javascript:fnDeleteHistory(@p.ProjectID)">
+            <i class="fa-solid fa-xmark me-2 text-danger"></i>
+            이력 삭제
+        </button>
     </div>
 
 </div>

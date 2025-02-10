@@ -330,6 +330,23 @@ namespace SecuDevCore.Controllers
             return Rtn;
         }
 
+        [HttpPost]
+        public int DeleteHistory(int ProjectID)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "ProjectID", ProjectID },
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_DELETE", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
+        }
+
         //public IActionResult IfDetail(int LocationID)
         //{
 
