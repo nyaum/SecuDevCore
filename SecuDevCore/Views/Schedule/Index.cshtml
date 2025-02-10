@@ -1,0 +1,53 @@
+﻿@using SecuDev.Models;
+@using SecuDev.Helper;
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string nowDate = Utility.GetNowDate();
+
+}
+
+<script src="/lib/FullCalendar/fullcalendar.js"></script>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            height: '80vh',
+            timeZone: 'Asia/Seoul',
+            themeSystem: 'bootstrap5',
+            selectable:true,
+            dayMaxEvents: true, // when too many events in a day, show the popover
+            events: @Html.Raw(ViewBag.Schedule),
+            select: function(info) {
+
+                // alert('selected ' + info.startStr + ' to ' + info.endStr);
+
+                addEvent(info.startStr, info.endStr)
+
+            }
+        });
+
+        function addEvent(start, end) {
+
+            calendar.addEvent({
+                title: 'New Event',
+                start: start,
+                end: end,
+                allDay: false
+            })
+
+        }
+
+        calendar.setOption('locale', 'ko');
+        calendar.render();
+
+    });
+
+    
+
+</script>
+
+<div id="calendar"></div>
+

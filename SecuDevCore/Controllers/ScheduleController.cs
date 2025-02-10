@@ -1,109 +1,30 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Net;
-using System.Security.Policy;
-using System.Xml;
-using CoreDAL.Configuration.Interface;
-using CoreDAL.ORM;
-using CryptoManager;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+Ôªøusing Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using SecuDev;
-using SecuDev.Filter;
+using Newtonsoft.Json;
+using System.Xml;
 using SecuDev.Helper;
-using SecuDev.Models;
-using SecuDevCore.Models;
+using CoreDAL.Configuration.Interface;
+using CryptoManager;
+using SecuDev;
 using SingletonManager;
 
 namespace SecuDevCore.Controllers
 {
-    public class Holiday
+    public class ScheduleController : Controller
     {
-        public string id { get; set; }
-        public string title { get; set; }
-        public string start { get; set; }
-        public string end { get; set; }
-        public bool allDay { get; set; }
-    }
-
-    public class HomeController : Controller
-    {
-
         IDatabaseSetup ConnDB = Singletons.Instance.GetKeyedSingleton<IDatabaseSetup>(SetupName.ConnDB);
         ICryptoManager crypto = Singletons.Instance.GetKeyedSingleton<ICryptoManager>(SetupName.SHA256);
 
         private readonly IWebHostEnvironment _env;
 
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(IWebHostEnvironment webHostEnvironment)
+        public ScheduleController(IWebHostEnvironment webHostEnvironment)
         {
             _env = webHostEnvironment;
         }
 
-        public IActionResult Index(string alertType = "")
+
+        public IActionResult Index()
         {
-            // ººº« √ ±‚»≠
-            HttpContext.Session.Clear();
-
-            var list = Utility.GetCategoryList();
-
-            ViewBag.alertType = alertType;
-
-            return View();
-        }
-
-        [HttpPost]
-        public string Login(IFormCollection col)
-        {
-
-            // ººº« √ ±‚»≠
-            HttpContext.Session.Clear();
-
-            string Rtn = "Invalid";
-
-            try
-            {
-                Dictionary<string, object> param = new Dictionary<string, object>
-                {
-                    { "UID", col["UID"].ToString() },
-                    { "Password", crypto.Encrypt(col["Password"]) }
-                };
-
-                SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_LOGIN", param);
-
-                DataSet ds = result.DataSet;
-
-                if (ds.Tables[0].Rows.Count == 1)
-                {
-
-                    HttpContext.Session.SetString("UID", ds.Tables[0].Rows[0]["UID"].ToString());
-                    HttpContext.Session.SetString("UserName", ds.Tables[0].Rows[0]["UserName"].ToString());
-                    HttpContext.Session.SetString("AuthorityLevel", ds.Tables[0].Rows[0]["AuthorityLevel"].ToString());
-
-                    HttpContext.Session.SetString("IPAddress", Utility.GetIP4Address());
-
-                    Rtn = ds.Tables[0].Rows[0]["Result"].ToString();
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Rtn = "ERR";
-            }
-
-            return Rtn;
-
-        }
-
-        [SessionFilter]
-        public IActionResult Main()
-        {
-
             List<Holiday> hlist = new List<Holiday>();
 
             string XmlDir = $"{_env.ContentRootPath}/Upload/Data/RestDeInfo.xml";
@@ -139,7 +60,7 @@ namespace SecuDevCore.Controllers
 
                     XmlNodeList xmlList = doc.SelectNodes(XmlNode);
 
-                    foreach(XmlNode data in xmlList)
+                    foreach (XmlNode data in xmlList)
                     {
 
                         Holiday h = new Holiday();
@@ -168,16 +89,11 @@ namespace SecuDevCore.Controllers
             ViewBag.Schedule = a;
 
             return View();
-        }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         /// <summary>
-        /// ∞¯»ﬁ¿œ XML∑Œ ¿˙¿Â »ƒ, List∑Œ ∞°¡Æø¿±‚
+        /// Í≥µÌú¥Ïùº XMLÎ°ú Ï†ÄÏû• ÌõÑ, ListÎ°ú Í∞ÄÏ†∏Ïò§Í∏∞
         /// </summary>
         /// <param name="url"></param>
         /// <param name="XmlDir"></param>
