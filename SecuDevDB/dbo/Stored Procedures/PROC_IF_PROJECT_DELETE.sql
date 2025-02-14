@@ -1,0 +1,23 @@
+﻿CREATE PROCEDURE PROC_IF_PROJECT_DELETE
+	@ProjectID INT = ''
+AS
+BEGIN
+	
+	DECLARE @Rtn INT = -1
+
+	BEGIN TRY
+		
+		UPDATE Project SET [Status] = 1 WHERE ProjectID = @ProjectID
+
+		SET @Rtn = 1
+
+	END TRY
+	BEGIN CATCH
+
+		RETURN -1
+
+	END CATCH
+
+	RETURN @Rtn
+
+END

@@ -11,6 +11,7 @@
     [UUID]             VARCHAR (MAX) NULL,
     [FileName]         VARCHAR (MAX) NULL,
     [InstallDate]      DATETIME      NULL,
+    [Status]           INT           DEFAULT ((0)) NULL,
     CONSTRAINT [PK_Project] PRIMARY KEY CLUSTERED ([ProjectID] ASC)
 );
 

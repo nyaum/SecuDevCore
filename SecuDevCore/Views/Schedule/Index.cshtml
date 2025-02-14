@@ -11,9 +11,12 @@
 
 <script>
 
-    document.addEventListener('DOMContentLoaded', function() {
+    var calender
+
+    $().ready(function(){
+
         var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
+        calendar = new FullCalendar.Calendar(calendarEl, {
             height: '80vh',
             timeZone: 'Asia/Seoul',
             themeSystem: 'bootstrap5',
@@ -24,26 +27,68 @@
 
                 // alert('selected ' + info.startStr + ' to ' + info.endStr);
 
-                addEvent(info.startStr, info.endStr)
+                fnOpenModal(info.startStr, info.endStr)
 
             }
         });
 
-        function addEvent(start, end) {
+        function fnOpenModal(start, end) {
 
-            calendar.addEvent({
-                title: 'New Event',
-                start: start,
-                end: end,
-                allDay: false
-            })
+            start = new Date(start)
+            $("#ScheduleStart").attr("date", dateFormat(start, 'yyyymmdd'))
+            $("#ScheduleStart").text(dateFormat(start, 'yyyy-mm-dd'))
+
+            end = new Date(end);
+            $("#ScheduleEnd").attr("date", dateFormat(end, 'yyyymmdd'))
+            end.setDate(end.getDate() - 1)
+            $("#ScheduleEnd").text(dateFormat(end, 'yyyy-mm-dd'))
+
+
+            $("#AddSchedule").modal('show')
+            $("#ScheduleContent").val("")
 
         }
 
         calendar.setOption('locale', 'ko');
         calendar.render();
+    })
+    
 
-    });
+    function fnAddSchedule(){
+
+        const start = $("#ScheduleStart").attr("date")
+        const end = $("#ScheduleEnd").attr("date")
+        const content = $("#ScheduleContent").val()
+
+        if (content == "") {
+            alert("내용을 입력해주세요.")
+            return
+        }
+
+        $.ajax({
+            type:"POST",
+            url:"/Schedule/Add",
+            data:{
+                start : start,
+                end : end,
+                content : content
+            },
+            success:function(){
+
+                calendar.addEvent({
+                    title: content,
+                    start: start,
+                    end: end,
+                    allDay: true
+                })
+            }
+        })
+
+
+
+
+        $("#AddSchedule").modal('toggle')
+    }
 
     
 
@@ -51,3 +96,35 @@
 
 <div id="calendar"></div>
 
+<div id="AddSchedule" class="modal fade">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <div class="d-flex align-items-center justify-content-center">
+                    <h6 class="m-0"> 일정 추가 </h6> 
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button></span>
+                </div>
+
+                <hr />
+
+                <div>
+                    <h6>기간</h6>
+                    <span id="ScheduleStart"></span> ~ <span id="ScheduleEnd"></span>
+                </div>
+
+                <hr />
+
+                <div>
+                    <h6>일정 내용</h6>
+                    <input type="text" id="ScheduleContent" class="form-control form-control-sm" />
+                </div>
+
+                <hr />
+
+                <button type="button" class="btn btn-border col-12" onclick="javascript:fnAddSchedule()">일정 등록</button>
+
+            </div>
+        </div>
+    </div>
+</div>

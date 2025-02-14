@@ -105,3 +105,20 @@ function fnReadContent(str) {
 function fnValidation(e) {
     e.value = e.value.replace(/[^a-z0-9_]/ig, '')
 }
+
+function dateFormat(date, format) {
+
+    var yyyy = date.getFullYear();
+    var mm = date.getMonth() + 1;
+    mm = mm >= 10 ? mm : '0' + mm;	// 10 보다 작으면 0을 앞에 붙여주기 ex) 3 > 03
+    var dd = date.getDate();
+    dd = dd >= 10 ? dd : '0' + dd;	// 10 보다 작으면 9을 앞에 붙여주기 ex) 9 > 09
+
+    if (format == "yyyy-mm-dd") {
+        return yyyy + '-' + mm + '-' + dd;
+    }
+    else if (format == "yyyymmdd") {
+        return yyyy + mm + dd;
+    }
+
+}

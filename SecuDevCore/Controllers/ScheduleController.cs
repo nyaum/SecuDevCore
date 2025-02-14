@@ -7,6 +7,11 @@ using CoreDAL.Configuration.Interface;
 using CryptoManager;
 using SecuDev;
 using SingletonManager;
+using CoreDAL.ORM;
+using SecuDevCore.Models;
+using SecuDev.Models;
+using System.Data;
+using CoreDAL.ORM.Extensions;
 
 namespace SecuDevCore.Controllers
 {
@@ -22,10 +27,9 @@ namespace SecuDevCore.Controllers
             _env = webHostEnvironment;
         }
 
-
         public IActionResult Index()
         {
-            List<Holiday> hlist = new List<Holiday>();
+            List<Schedule> slist = new List<Schedule>();
 
             string XmlDir = $"{_env.ContentRootPath}/Upload/Data/RestDeInfo.xml";
             string XmlNode = "/response/body/items/item";
@@ -50,7 +54,7 @@ namespace SecuDevCore.Controllers
                 {
                     var xmlList = XmlSave(url, XmlDir, XmlNode);
 
-                    hlist = xmlList.Result;
+                    slist = xmlList.Result;
 
                 }
                 else
@@ -63,13 +67,13 @@ namespace SecuDevCore.Controllers
                     foreach (XmlNode data in xmlList)
                     {
 
-                        Holiday h = new Holiday();
+                        Schedule s = new Schedule();
 
-                        h.title = data.SelectSingleNode("dateName").InnerText;
-                        h.start = data.SelectSingleNode("locdate").InnerText;
-                        h.allDay = true;
+                        s.title = data.SelectSingleNode("dateName").InnerText;
+                        s.start = data.SelectSingleNode("locdate").InnerText;
+                        s.allDay = true;
 
-                        hlist.Add(h);
+                        slist.Add(s);
 
                     }
 
@@ -81,10 +85,28 @@ namespace SecuDevCore.Controllers
 
                 var xmlList = XmlSave(url, XmlDir, XmlNode);
 
-                hlist = xmlList.Result;
+                slist = xmlList.Result;
             }
 
-            object a = JToken.Parse(JsonConvert.SerializeObject(hlist));
+            // DB 가져오기
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_SCHEDULE_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<Schedule> list = new List<Schedule>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                slist.Add(i.ToObject<Schedule>());
+            }
+
+            object a = JToken.Parse(JsonConvert.SerializeObject(slist));
 
             ViewBag.Schedule = a;
 
@@ -99,9 +121,9 @@ namespace SecuDevCore.Controllers
         /// <param name="XmlDir"></param>
         /// <param name="XmlNode"></param>
         /// <returns></returns>
-        public async Task<List<Holiday>> XmlSave(string url, string XmlDir, string XmlNode)
+        public async Task<List<Schedule>> XmlSave(string url, string XmlDir, string XmlNode)
         {
-            List<Holiday> hlist = new List<Holiday>();
+            List<Schedule> slist = new List<Schedule>();
 
             using (var client = new HttpClient())
             {
@@ -121,21 +143,40 @@ namespace SecuDevCore.Controllers
                 foreach (XmlNode data in xmlList)
                 {
 
-                    Holiday h = new Holiday();
+                    Schedule s = new Schedule();
 
-                    h.title = data.SelectSingleNode("dateName").InnerText;
-                    h.start = data.SelectSingleNode("locdate").InnerText;
-                    h.end = data.SelectSingleNode("locdate").InnerText;
-                    h.allDay = true;
+                    s.title = data.SelectSingleNode("dateName").InnerText;
+                    s.start = data.SelectSingleNode("locdate").InnerText;
+                    s.end = data.SelectSingleNode("locdate").InnerText;
+                    s.allDay = true;
 
-                    hlist.Add(h);
+                    slist.Add(s);
 
                 }
 
-                return hlist;
+                return slist;
 
             }
 
+        }
+
+        [HttpPost]
+        public int Add(string start, string end, string content)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "StartDate",  start},
+                { "EndDate", end },
+                { "ScheduleName", content }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_SCHEDULE_ADD", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
         }
     }
 }

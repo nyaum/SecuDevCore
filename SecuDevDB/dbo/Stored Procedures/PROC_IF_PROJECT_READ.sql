@@ -16,5 +16,5 @@ BEGIN
 	INNER JOIN Software s ON p.SoftwareID = s.SoftwareID
 	INNER JOIN InstallType i ON p.InstallTypeID = i.InstallTypeID
 	INNER JOIN Users u ON p.ProjectManagerID = u.UID
-	WHERE ProjectID = @ProjectID
+	WHERE ProjectID = @ProjectID AND p.[Status] = 0
 END

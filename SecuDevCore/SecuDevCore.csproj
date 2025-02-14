@@ -36,6 +36,7 @@
     <PackageReference Include="CryptoManager" Version="1.0.3" />
     <PackageReference Include="FileIOHelper" Version="1.1.1" />
     <PackageReference Include="SingletonManager" Version="1.5.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.2" />
     <PackageReference Include="X.PagedList" Version="10.5.7" />
     <PackageReference Include="X.PagedList.EF" Version="10.5.7" />
     <PackageReference Include="X.PagedList.EntityFramework" Version="10.5.7" />

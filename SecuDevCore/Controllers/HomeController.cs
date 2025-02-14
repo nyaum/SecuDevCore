@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Net;
@@ -7,6 +8,7 @@ using System.Security.Policy;
 using System.Xml;
 using CoreDAL.Configuration.Interface;
 using CoreDAL.ORM;
+using CoreDAL.ORM.Extensions;
 using CryptoManager;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -17,17 +19,18 @@ using SecuDev.Helper;
 using SecuDev.Models;
 using SecuDevCore.Models;
 using SingletonManager;
+using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace SecuDevCore.Controllers
 {
-    public class Holiday
-    {
-        public string id { get; set; }
-        public string title { get; set; }
-        public string start { get; set; }
-        public string end { get; set; }
-        public bool allDay { get; set; }
-    }
+    //public class Holiday
+    //{
+    //    public string id { get; set; }
+    //    public string title { get; set; }
+    //    public string start { get; set; }
+    //    public string end { get; set; }
+    //    public bool allDay { get; set; }
+    //}
 
     public class HomeController : Controller
     {
@@ -104,7 +107,16 @@ namespace SecuDevCore.Controllers
         public IActionResult Main()
         {
 
-            List<Holiday> hlist = new List<Holiday>();
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            var settings = config.AppSettings.Settings;
+
+            if (settings["test"] == null) settings.Add("test", "1");
+            else settings["test"].Value = (int.Parse(settings["test"].Value) + 1).ToString();
+
+            config.Save(ConfigurationSaveMode.Modified); //파일에 저장
+
+            List<Schedule> slist = new List<Schedule>();
 
             string XmlDir = $"{_env.ContentRootPath}/Upload/Data/RestDeInfo.xml";
             string XmlNode = "/response/body/items/item";
@@ -129,7 +141,7 @@ namespace SecuDevCore.Controllers
                 {
                     var xmlList = XmlSave(url, XmlDir, XmlNode);
 
-                    hlist = xmlList.Result;
+                    slist = xmlList.Result;
 
                 }
                 else
@@ -139,16 +151,16 @@ namespace SecuDevCore.Controllers
 
                     XmlNodeList xmlList = doc.SelectNodes(XmlNode);
 
-                    foreach(XmlNode data in xmlList)
+                    foreach (XmlNode data in xmlList)
                     {
 
-                        Holiday h = new Holiday();
+                        Schedule s = new Schedule();
 
-                        h.title = data.SelectSingleNode("dateName").InnerText;
-                        h.start = data.SelectSingleNode("locdate").InnerText;
-                        h.allDay = true;
+                        s.title = data.SelectSingleNode("dateName").InnerText;
+                        s.start = data.SelectSingleNode("locdate").InnerText;
+                        s.allDay = true;
 
-                        hlist.Add(h);
+                        slist.Add(s);
 
                     }
 
@@ -160,10 +172,28 @@ namespace SecuDevCore.Controllers
 
                 var xmlList = XmlSave(url, XmlDir, XmlNode);
 
-                hlist = xmlList.Result;
+                slist = xmlList.Result;
             }
 
-            object a = JToken.Parse(JsonConvert.SerializeObject(hlist));
+            // DB 가져오기
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_SCHEDULE_LIST", param);
+
+            DataSet ds = result.DataSet;
+
+            List<Schedule> list = new List<Schedule>();
+
+            foreach (DataRow i in ds.Tables[0].Rows)
+            {
+                slist.Add(i.ToObject<Schedule>());
+            }
+
+            object a = JToken.Parse(JsonConvert.SerializeObject(slist));
 
             ViewBag.Schedule = a;
 
@@ -183,9 +213,9 @@ namespace SecuDevCore.Controllers
         /// <param name="XmlDir"></param>
         /// <param name="XmlNode"></param>
         /// <returns></returns>
-        public async Task<List<Holiday>> XmlSave(string url, string XmlDir, string XmlNode)
+        public async Task<List<Schedule>> XmlSave(string url, string XmlDir, string XmlNode)
         {
-            List<Holiday> hlist = new List<Holiday>();
+            List<Schedule> slist = new List<Schedule>();
 
             using (var client = new HttpClient())
             {
@@ -205,18 +235,18 @@ namespace SecuDevCore.Controllers
                 foreach (XmlNode data in xmlList)
                 {
 
-                    Holiday h = new Holiday();
+                    Schedule s = new Schedule();
 
-                    h.title = data.SelectSingleNode("dateName").InnerText;
-                    h.start = data.SelectSingleNode("locdate").InnerText;
-                    h.end = data.SelectSingleNode("locdate").InnerText;
-                    h.allDay = true;
+                    s.title = data.SelectSingleNode("dateName").InnerText;
+                    s.start = data.SelectSingleNode("locdate").InnerText;
+                    s.end = data.SelectSingleNode("locdate").InnerText;
+                    s.allDay = true;
 
-                    hlist.Add(h);
+                    slist.Add(s);
 
                 }
 
-                return hlist;
+                return slist;
 
             }
 

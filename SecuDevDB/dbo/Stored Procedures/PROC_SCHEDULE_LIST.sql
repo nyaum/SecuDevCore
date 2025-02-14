@@ -1,0 +1,9 @@
+﻿CREATE PROCEDURE PROC_SCHEDULE_LIST
+AS
+BEGIN
+	SELECT 
+		ScheduleName,
+		StartDate,
+		EndDate	
+	FROM Schedule
+END

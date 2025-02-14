@@ -16,7 +16,7 @@ BEGIN
 	INNER JOIN Software s ON s.SoftwareID = p.SoftwareID
 	INNER JOIN InstallType it ON it.InstallTypeID = p.InstallTypeID
 	INNER JOIN Users u ON u.UID = p.ProjectManagerID
-	WHERE l.LocationID = @LocationID
+	WHERE l.LocationID = @LocationID AND p.[Status] = 0
 	ORDER BY InstallDate DESC
 
 	-- Table 1
