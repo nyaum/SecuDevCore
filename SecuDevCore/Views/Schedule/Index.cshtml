@@ -6,6 +6,11 @@
     string nowDate = Utility.GetNowDate();
 
 }
+<style>
+    .fc-event-title-container{
+        cursor:pointer
+    }
+</style>
 
 <script src="/lib/FullCalendar/fullcalendar.js"></script>
 
@@ -27,25 +32,55 @@
 
                 // alert('selected ' + info.startStr + ' to ' + info.endStr);
 
-                fnOpenModal(info.startStr, info.endStr)
+                fnOpenModal(info.startStr, info.endStr, "A")
+
+            },
+            eventClick: function(info) {
+
+                console.log(info.event.id)
+
+                if (info.event.id == null || info.event.id == 0) {
+                    alert("수정/삭제가 불가능한 일정입니다.")
+
+                    return;
+                }
+
+                $("#ModifyContent").val(info.event.title);
+                $("#ModifySchedule button").attr("data-id", info.event.id)
+
+                fnOpenModal(info.event.startStr, info.event.endStr, "M")
 
             }
         });
 
-        function fnOpenModal(start, end) {
+        function fnOpenModal(start, end, type) {
 
             start = new Date(start)
-            $("#ScheduleStart").attr("date", dateFormat(start, 'yyyymmdd'))
-            $("#ScheduleStart").text(dateFormat(start, 'yyyy-mm-dd'))
+
+            if (type == "A") {
+                _Start = "#ScheduleStart";
+                _End = "#ScheduleEnd";
+                _Content = "#ScheduleContent"
+                _Modal = "#AddSchedule"
+                $(_Content).val("")
+            }
+            else 
+            {
+                _Start = "#ModifyStart";
+                _End = "#ModifyEnd";
+                _Content = "#ModifyContent"
+                _Modal = "#ModifySchedule"
+            }
+
+            $(_Start).attr("date", dateFormat(start, 'yyyymmdd'))
+            $(_Start).text(dateFormat(start, 'yyyy-mm-dd'))
 
             end = new Date(end);
-            $("#ScheduleEnd").attr("date", dateFormat(end, 'yyyymmdd'))
+            $(_End).attr("date", dateFormat(end, 'yyyymmdd'))
             end.setDate(end.getDate() - 1)
-            $("#ScheduleEnd").text(dateFormat(end, 'yyyy-mm-dd'))
+            $(_End).text(dateFormat(end, 'yyyy-mm-dd'))
 
-
-            $("#AddSchedule").modal('show')
-            $("#ScheduleContent").val("")
+            $(_Modal).modal('show')
 
         }
 
@@ -73,9 +108,10 @@
                 end : end,
                 content : content
             },
-            success:function(){
+            success:function(id){
 
                 calendar.addEvent({
+                    id : id,
                     title: content,
                     start: start,
                     end: end,
@@ -90,8 +126,60 @@
         $("#AddSchedule").modal('toggle')
     }
 
-    
+    function fnModifySchedule(data) {
 
+        const id = $(data).attr("data-id")
+        const content = $("#ModifyContent").val()
+
+        if(confirm("수정하시겠습니까?")){
+            $.ajax({
+                type:"POST",
+                url:"/Schedule/Edit",
+                data:{id:id, content:content},
+                success:function(data){
+                
+                    if (data == -1) {
+                        alert ("처리중 오류가 발생했습니다.")
+                        return;
+                    }
+                    else if (data == 1) {
+                        alert("정상 처리 되었습니다.")
+
+                        location.reload()
+                    }
+
+                }
+
+            })
+        }
+    }
+
+    function fnDeleteSchedule(data) {
+
+        const id = $(data).attr("data-id")
+
+        if (confirm("삭제하시겠습니까")) {
+            $.ajax({
+                type:"POST",
+                url:"/Schedule/Delete",
+                data:{id:id},
+                success:function(data){
+
+                    if (data == -1) {
+                        alert ("처리중 오류가 발생했습니다.")
+                        return;
+                    }
+                    else if (data == 1) {
+                        alert("정상 처리 되었습니다.")
+
+                        location.reload()
+                    }
+
+                }
+
+            })
+        }
+    }
 </script>
 
 <div id="calendar"></div>
@@ -103,7 +191,7 @@
 
                 <div class="d-flex align-items-center justify-content-center">
                     <h6 class="m-0"> 일정 추가 </h6> 
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button></span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
                 </div>
 
                 <hr />
@@ -123,6 +211,42 @@
                 <hr />
 
                 <button type="button" class="btn btn-border col-12" onclick="javascript:fnAddSchedule()">일정 등록</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ModifySchedule" class="modal fade">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+
+                <div class="d-flex align-items-center justify-content-center">
+                    <h6 class="m-0"> 일정 수정 </h6>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
+                </div>
+
+                <hr />
+
+                <div>
+                    <h6>기간</h6>
+                    <span id="ModifyStart"></span> ~ <span id="ModifyEnd"></span>
+                </div>
+
+                <hr />
+
+                <div>
+                    <h6>일정 내용</h6>
+                    <input type="text" id="ModifyContent" class="form-control form-control-sm" />
+                </div>
+
+                <hr />
+                
+                <div class="btn-group col-12">
+                    <button type="button" class="btn btn-border" data-id="" onclick="javascript:fnModifySchedule(this)">수정</button>
+                    <button type="button" class="btn btn-border" data-id="" onclick="javascript:fnDeleteSchedule(this)">삭제</button>
+                </div>
 
             </div>
         </div>

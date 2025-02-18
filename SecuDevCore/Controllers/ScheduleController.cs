@@ -178,5 +178,39 @@ namespace SecuDevCore.Controllers
 
             return Rtn;
         }
+        [HttpPost]
+        public int Edit(int id, string content)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "ScheduleID", id },
+                { "ScheduleName", content }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_SCHEDULE_EDIT", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
+        }
+
+        [HttpPost]
+        public int Delete(int id)
+        {
+            int Rtn = -1;
+
+            Dictionary<string, object> param = new Dictionary<string, object>
+            {
+                { "ScheduleID", id }
+            };
+
+            SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_SCHEDULE_DELETE", param);
+
+            Rtn = result.ReturnValue;
+
+            return Rtn;
+        }
     }
 }

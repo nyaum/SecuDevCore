@@ -2,7 +2,17 @@
 {
     public class Schedule
     {
-        public string id { get; set; }
+        public int id { get; set; }
+        public int _ScheduleID;
+        public int ScheduleID
+        {
+            get => _ScheduleID;
+            set
+            {
+                _ScheduleID = value;
+                id = value;
+            }
+        }
         public string title { get; set; }
         public string start { get; set; }
         public string end { get; set; }
