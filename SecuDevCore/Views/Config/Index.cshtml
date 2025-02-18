@@ -53,9 +53,9 @@
 
             const target = $(this).attr("data-target");
 
-            if (confirm("이름을 변경하시겠습니까?")) {
+            actionToast.confirm("이름을 변경하시겠습니까?",function() {
                 fnUpdateCategory(target);
-            }
+            })
 
         });
 
@@ -133,7 +133,7 @@
         // li 요소에 flexContainer 추가
         li.append(flexContainer);
 
-        if (confirm("추가하시겠습니까?")) {
+        actionToast.confirm("추가하시겠습니까?", function() {
 
 
             $.ajax({
@@ -148,7 +148,7 @@
 
             $("#CategoryName").val("");
 
-        }
+        })
 
     }
 
@@ -220,14 +220,14 @@
         // li 요소에 flexContainer 추가
         li.append(flexContainer);
 
-        if(confirm("추가하시겠습니까?")){
+        actionToast.confirm("추가하시겠습니까?", function(){
 
             // 최종적으로 li를 category-list에 추가
             $('#AuthorityList').append(li);
 
             $("#AuthorityName").val("");
 
-        }
+        })
 
     }
 
@@ -285,13 +285,13 @@
             
                 if (data == 1) {
                     
-                    alert ("정상 처리되었습니다.");
+                    actionToast.alert ("정상 처리되었습니다.");
 
                 }
                 else
                 {
             
-                    alert ("처리중 오류가 발생했습니다.")
+                    actionToast.alert ("처리중 오류가 발생했습니다.")
 
                 }
 
@@ -320,14 +320,14 @@
                 
                 if (data == "OK") {
 
-                    alert("정상 처리되었습니다.");
+                    actionToast.alert("정상 처리되었습니다.");
 
                     location.reload();
 
                 }
                 else
                 {
-                    alert("처리중 오류가 발생했습니다.")
+                    actionToast.alert("처리중 오류가 발생했습니다.")
                 }
             }
         })

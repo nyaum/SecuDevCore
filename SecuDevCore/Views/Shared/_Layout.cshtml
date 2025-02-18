@@ -67,6 +67,9 @@
     <!-- Custom JS -->
     <script src="/lib/common.js?"></script>
 
+    <!--alertToast JS-->
+    <script src="~/lib/alertToast.js"></script>
+
     <script>
         $().ready(function(){
         
@@ -177,14 +180,14 @@
 
                 if (Duplicate === false ) {
 
-                    alert ("아이디를 확인 후 다시 입력해주세요.")
+                    actionToast.alert ("아이디를 확인 후 다시 입력해주세요.")
 
                     return;
                 }
 
                 if( PasswordMatch === false) {
 
-                    alert("비밀번호가 서로 일치하지 않습니다.")
+                    actionToast.alert("비밀번호가 서로 일치하지 않습니다.")
 
                     return;
                 }
@@ -198,7 +201,7 @@
 
                     if ( PasswordMatch === false ) {
 
-                        alert("비밀번호가 서로 일치하지 않습니다.")
+                        actionToast.alert("비밀번호가 서로 일치하지 않습니다.")
 
                         return;
                     }
@@ -221,20 +224,20 @@
                 success:function(data){
 
                     if (data == 0) {
-                        alert ("입력값을 다시 확인해주세요.")
+                        actionToast.alert ("입력값을 다시 확인해주세요.")
 
                         return;
                     }
 
                     if (data == -1) {
-                        alert ("등록 중 오류가 발생했습니다.")
+                        actionToast.alert ("등록 중 오류가 발생했습니다.")
 
                         return;
                     }
 
                     if (data == 1 ) {
 
-                        alert ("정상 등록되었습니다.")
+                        actionToast.alert ("정상 등록되었습니다.")
 
                         location.href = "/Home/Main"
 

@@ -24,7 +24,7 @@
 
         if (ContactName == '') {
 
-            alert("입력 값을 다시 확인해주세요.")
+            actionToast.alert("입력 값을 다시 확인해주세요.")
 
             $("#ContactName").focus();
 
@@ -33,7 +33,7 @@
 
         if (ContactGrade == '') {
 
-            alert("입력 값을 다시 확인해주세요.")
+            actionToast.alert("입력 값을 다시 확인해주세요.")
 
             $("#ContactGrade").focus();
 
@@ -42,7 +42,7 @@
 
         if (ContactCompany == '') {
 
-            alert("입력 값을 다시 확인해주세요.")
+            actionToast.alert("입력 값을 다시 확인해주세요.")
 
             $("#ContactCompany").focus();
 
@@ -51,7 +51,7 @@
 
         if (ContactTel == '') {
 
-            alert("입력 값을 다시 확인해주세요.")
+            actionToast.alert("입력 값을 다시 확인해주세요.")
 
             $("#ContactTel").focus();
 
@@ -62,7 +62,7 @@
 
         if(!pattern.test(ContactEmail) || ContactEmail == '') {
 
-            alert("입력 값을 다시 확인해주세요.")
+            actionToast.alert("입력 값을 다시 확인해주세요.")
 
             $("#ContactEmail").focus();
 
@@ -83,15 +83,15 @@
             success: function(data){
 
                 if (data == 0) {
-                    alert("처리중 오류가 발생했습니다.")
+                    actionToast.alert("처리중 오류가 발생했습니다.")
                 }
                 else if (data == -1)
                 {
-                    alert("처리중 오류가 발생했습니다.")
+                    actionToast.alert("처리중 오류가 발생했습니다.")
                 }
                 else if (data == -2) 
                 {
-                    alert("이미 등록되어있습니다.")
+                    actionToast.alert("이미 등록되어있습니다.")
                 }
                 else {
 
@@ -137,7 +137,7 @@
                     $("#ContactTel").val('')
                     $("#ContactEmail").val('')
 
-                    alert("정상 처리되었습니다.")
+                    actionToast.alert("정상 처리되었습니다.")
 
                 }
 
@@ -159,13 +159,13 @@
             success: function(data){
 
                 if (data == 0) {
-                    alert("처리중 오류가 발생했습니다.")
+                    actionToast.alert("처리중 오류가 발생했습니다.")
                 }
                 else {                                                                                                                                                                                                                  
 
                     parent.changeIframeUrl('/Project/IfAddContact?LocationID=@LocationID')
 
-                    alert("정상 처리되었습니다.")
+                    actionToast.alert("정상 처리되었습니다.")
 
                 }
 

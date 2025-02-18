@@ -53,7 +53,7 @@
 
     function fnDelete() {
 
-        if( confirm("삭제하시겠습니까?") ) {
+        actionToast.confirm("삭제하시겠습니까?", function(){
 
             const Param = "BID=" + "@b.BID";
 
@@ -71,14 +71,14 @@
                     }
                     else {
 
-                        alert("처리중 오류가 발생했습니다")
+                        actionToast.alert("처리중 오류가 발생했습니다")
 
                     }
                 }
 
             })
 
-        }
+        })
 
     }
 

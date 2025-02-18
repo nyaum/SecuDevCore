@@ -44,7 +44,7 @@
 
         const LocationID = parent.fnGetLocationID();
 
-        if(confirm("해당 이력을 삭제하시겠습니까?")){
+        actionToast.confirm("해당 이력을 삭제하시겠습니까?", function(){
             $.ajax({
                 type: 'POST',
                 url: '/Project/DeleteHistory',
@@ -53,19 +53,19 @@
                     
                     if (data == 1) 
                     {
-                        alert("정상 처리 되었습니다.")
+                        actionToast.alert("정상 처리 되었습니다.")
 
                         parent.changeIframeUrl("/Project/IfRead?LocationID=" + LocationID);
 
                     }
                     else
                     {
-                        alert("처리중 오류가 발생했습니다.")
+                        actionToast.alert("처리중 오류가 발생했습니다.")
                     }
 
                 }
             })
-        }
+        })
     }
 </script>
 <div>

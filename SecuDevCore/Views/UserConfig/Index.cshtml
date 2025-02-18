@@ -13,7 +13,7 @@
 
     if (AuthorityLevel > 0) {
         <script>
-            alert("관리자용 페이지 입니다.")
+            actionToast.alert("관리자용 페이지 입니다.")
             location.href = "/Home/Main";
         </script>
     }
@@ -219,14 +219,14 @@
 
             if (Duplicate === false ) {
                 
-                alert ("아이디를 확인 후 다시 입력해주세요.")
+                actionToast.alert ("아이디를 확인 후 다시 입력해주세요.")
 
                 return;
             } 
             
             if( PasswordMatch === false) {
 
-                alert("비밀번호가 서로 일치하지 않습니다.")
+                actionToast.alert("비밀번호가 서로 일치하지 않습니다.")
 
                 return;
             }
@@ -240,7 +240,7 @@
 
                 if ( PasswordMatch === false ) {
 
-                    alert("비밀번호가 서로 일치하지 않습니다.")
+                    actionToast.alert("비밀번호가 서로 일치하지 않습니다.")
 
                     return;
                 }
@@ -263,20 +263,20 @@
             success:function(data){
 
                 if (data == 0) {
-                    alert ("입력값을 다시 확인해주세요.")
+                    actionToast.alert ("입력값을 다시 확인해주세요.")
 
                     return;
                 }
 
                 if (data == -1) {
-                    alert ("등록 중 오류가 발생했습니다.")
+                    actionToast.alert ("등록 중 오류가 발생했습니다.")
 
                     return;
                 }
 
                 if (data == 1 ) {
                         
-                    alert ("정상 등록되었습니다.")
+                    actionToast.alert ("정상 등록되었습니다.")
 
                     location.href = "/UserConfig"
 
@@ -294,7 +294,7 @@
             if (UID == "@UID")
             {
 
-                alert("현재 접속중인 계정은 삭제할수 없습니다.")
+                actionToast.alert("현재 접속중인 계정은 삭제할수 없습니다.")
 
                 return;
             }
@@ -309,20 +309,20 @@
                 
                 if (data == 1) {
 
-                    alert("정상 처리되었습니다.")
+                    actionToast.alert("정상 처리되었습니다.")
 
                     location.href = "/UserConfig";
                 }
 
 
                 if (data == 0) {
-                    alert ("존재하지 않는 계정이거나, 이미 처리 된 계정입니다.")
+                    actionToast.alert ("존재하지 않는 계정이거나, 이미 처리 된 계정입니다.")
 
                     return
                 }
 
                 if (data == -1) {
-                    alert ("처리 중 오류가 발생했습니다.")
+                    actionToast.alert ("처리 중 오류가 발생했습니다.")
 
                     return
                 }

@@ -256,17 +256,17 @@
         }
 
         if (CID == "") {
-            alert("카테고리가 선택되지 않았습니다.")
+            actionToast.alert("카테고리가 선택되지 않았습니다.")
             return;
         }
 
         if (Title == "") {
-            alert("제목을 입력해주세요.")
+            actionToast.alert("제목을 입력해주세요.")
             return;
         }
 
         if (Content == "") {
-            alert("글 내용을 입력해주세요.")
+            actionToast.alert("글 내용을 입력해주세요.")
             return;
         }
 
@@ -281,7 +281,7 @@
 
                 if (rtn != -1) {
 
-                    alert("정상 등록되었습니다.");
+                    actionToast.alert("정상 등록되었습니다.");
 
                     // 이동할 페이지
 
@@ -290,7 +290,7 @@
                 }
                 else if (rtn == -1) {
 
-                    alert("글 작성중 DB 오류가 발생했습니다.")
+                    actionToast.alert("글 작성중 DB 오류가 발생했습니다.")
 
                     return
                 }

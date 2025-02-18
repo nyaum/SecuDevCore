@@ -40,7 +40,8 @@
                 console.log(info.event.id)
 
                 if (info.event.id == null || info.event.id == 0) {
-                    alert("수정/삭제가 불가능한 일정입니다.")
+
+                    actionToast.alert("수정/삭제가 불가능한 일정입니다.")
 
                     return;
                 }
@@ -96,7 +97,7 @@
         const content = $("#ScheduleContent").val()
 
         if (content == "") {
-            alert("내용을 입력해주세요.")
+            actionToast.alert("내용을 입력해주세요.")
             return
         }
 
@@ -131,19 +132,20 @@
         const id = $(data).attr("data-id")
         const content = $("#ModifyContent").val()
 
-        if(confirm("수정하시겠습니까?")){
+        actionToast.confirm("수정하시겠습니까?", function(){
+        
             $.ajax({
                 type:"POST",
                 url:"/Schedule/Edit",
                 data:{id:id, content:content},
                 success:function(data){
-                
+
                     if (data == -1) {
-                        alert ("처리중 오류가 발생했습니다.")
+                        actionToast.alert ("처리중 오류가 발생했습니다.")
                         return;
                     }
                     else if (data == 1) {
-                        alert("정상 처리 되었습니다.")
+                        actionToast.alert("정상 처리 되었습니다.")
 
                         location.reload()
                     }
@@ -151,14 +153,15 @@
                 }
 
             })
-        }
+
+        })
     }
 
     function fnDeleteSchedule(data) {
 
         const id = $(data).attr("data-id")
 
-        if (confirm("삭제하시겠습니까")) {
+        actionToast.confirm("삭제하시겠습니까", function(){
             $.ajax({
                 type:"POST",
                 url:"/Schedule/Delete",
@@ -166,11 +169,11 @@
                 success:function(data){
 
                     if (data == -1) {
-                        alert ("처리중 오류가 발생했습니다.")
+                        actionToast.alert ("처리중 오류가 발생했습니다.")
                         return;
                     }
                     else if (data == 1) {
-                        alert("정상 처리 되었습니다.")
+                        actionToast.alert("정상 처리 되었습니다.")
 
                         location.reload()
                     }
@@ -178,7 +181,7 @@
                 }
 
             })
-        }
+        })
     }
 </script>
 
