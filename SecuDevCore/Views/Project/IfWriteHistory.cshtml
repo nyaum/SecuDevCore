@@ -2,7 +2,9 @@
 @using SecuDev.Models;
 @{
     Layout = "~/Views/Shared/_PopLayout.cshtml";
+    var PageType = ViewBag.PageType;
     var LocationID = ViewBag.LocationID;
+    Project p = ViewBag.Project;
 }
 <!-- FilePond -->
 <script src="~/lib/FilePond/filepond.min.js"></script>
@@ -57,6 +59,46 @@
                 direction: "asc"
             }
         });
+
+        if ("@PageType" == "E") {
+
+            var FILEPOND_SOURCE = [];
+
+            $("#category").attr("data-value", "@p.SoftwareName")
+            $("#category").text("@Html.Raw(p.InstallTypeName)")
+            $("#title").val("@Html.Raw(p.InstallTypeName)")
+            $("#Content").val("@Html.Raw(p.Content)")
+
+            var FileName = "@Html.Raw(p.FileName)".split("|")
+            var uniqueFileId = "@Html.Raw(p.UUID)".split("|")
+
+            FileName.forEach(function (elem, index) {
+
+                var json = {
+                    fileName: FileName[index],
+                    uniqueFileId: uniqueFileId[index]
+                }
+
+                var filepond_json = {
+                    source: String.format("{\"uniqueFileId\":\"{0}\",\"fileName\":\"{1}\",\"PageType\":\"{2}\"}", uniqueFileId[index], FileName[index], "E"),
+                    options: {
+                        type: 'limbo',
+                        file: {
+                            name: FileName[index]
+                        }
+                    }
+                }
+
+                FILELIST.push(json);
+                FILEPOND_SOURCE.push(filepond_json)
+
+            })
+
+            file = FILEPOND_SOURCE;
+
+            fnCreateFilePond(file);
+
+        }
 
     })
 

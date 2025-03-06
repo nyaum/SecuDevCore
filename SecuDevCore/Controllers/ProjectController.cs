@@ -97,8 +97,28 @@ namespace SecuDevCore.Controllers
             return View(list.ToPagedList(PageNo, PageSize));
         }
 
-        public IActionResult IfWriteHistory(int LocationID)
+        public IActionResult IfWriteHistory(int LocationID, int ProjectID = 0)
         {
+
+            if (ProjectID > 0)
+            {
+                Dictionary<string, object> param = new Dictionary<string, object>
+                {
+                    { "ProjectID", ProjectID }
+                };
+
+                SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_READ", param);
+
+                DataSet ds = result.DataSet;
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    Project p = ds.Tables[0].Rows[0].ToObject<Project>();
+
+                    ViewBag.Project = p;
+                }
+
+            }
 
             ViewBag.LocationID = LocationID;
 

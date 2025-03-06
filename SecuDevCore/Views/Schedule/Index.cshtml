@@ -132,6 +132,11 @@
         const id = $(data).attr("data-id")
         const content = $("#ModifyContent").val()
 
+        if (content == "") {
+            actionToast.alert("내용을 입력해주세요.")
+            return
+        }
+
         actionToast.confirm("수정하시겠습니까?", function(){
         
             $.ajax({
@@ -203,7 +208,7 @@
                     <h6>기간</h6>
                     <span id="ScheduleStart"></span> ~ <span id="ScheduleEnd"></span>
                 </div>
-
+                +
                 <hr />
 
                 <div>

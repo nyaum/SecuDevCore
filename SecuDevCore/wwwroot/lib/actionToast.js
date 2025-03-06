@@ -1,4 +1,5 @@
 ﻿// Version: 1.0
+// 2025-02-18 : MHJ
 // required: bootstrap5, jquery
 
 var actionToast = {

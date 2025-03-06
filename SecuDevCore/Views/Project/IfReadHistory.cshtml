@@ -40,6 +40,14 @@
         }
     })
 
+    function fnEditHistory(ProjectID) {
+
+        const LocationID = parent.fnGetLocationID();
+
+        parent.changeIframeUrl("/Project/IfWriteHistory?LocationID=" + LocationID + "&ProjectID=" + ProjectID);
+
+    }
+
     function fnDeleteHistory(ProjectID){
 
         const LocationID = parent.fnGetLocationID();
@@ -124,11 +132,18 @@
 
     <hr />
 
-    <div>
-        <button class="btn btn-border float-end" onclick="javascript:fnDeleteHistory(@p.ProjectID)">
-            <i class="fa-solid fa-xmark me-2 text-danger"></i>
-            이력 삭제
+    <div class="float-end">
+
+        <button class="btn btn-border" onclick="javascript:fnEditHistory(@p.ProjectID)">
+            <i class="fa-solid fa-pen-to-square me-2 text-warning"></i>
+            수정
         </button>
+
+        <button class="btn btn-border" onclick="javascript:fnDeleteHistory(@p.ProjectID)">
+            <i class="fa-solid fa-xmark me-2 text-danger"></i>
+            삭제
+        </button>
+
     </div>
 
 </div>
