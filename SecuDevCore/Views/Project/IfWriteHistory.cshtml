@@ -60,43 +60,52 @@
             }
         });
 
-        if ("@PageType" == "E") {
+        //https://localhost:7286/Project/IfWriteHistory?LocationID=5&ProjectID=204
+
+        // ProjectID가 0 이상일때만 동작
+        if (@p.ProjectID > 0) {
 
             var FILEPOND_SOURCE = [];
 
-            $("#category").attr("data-value", "@p.SoftwareName")
-            $("#category").text("@Html.Raw(p.InstallTypeName)")
-            $("#title").val("@Html.Raw(p.InstallTypeName)")
+            Software.setValue("@Html.Raw(p.SoftwareID)")
+            InstallType.setValue("@Html.Raw(p.InstallTypeID)")
+            User.setValue("@Html.Raw(p.UID)")
+
             $("#Content").val("@Html.Raw(p.Content)")
+            $("#Version").val("@Html.Raw(p.Version)")
 
             var FileName = "@Html.Raw(p.FileName)".split("|")
             var uniqueFileId = "@Html.Raw(p.UUID)".split("|")
 
-            FileName.forEach(function (elem, index) {
+            if(FileName != "" && uniqueFileId != ""){
+                
+                FileName.forEach(function (elem, index) {
 
-                var json = {
-                    fileName: FileName[index],
-                    uniqueFileId: uniqueFileId[index]
-                }
+                    var json = {
+                        fileName: FileName[index],
+                        uniqueFileId: uniqueFileId[index]
+                    }
 
-                var filepond_json = {
-                    source: String.format("{\"uniqueFileId\":\"{0}\",\"fileName\":\"{1}\",\"PageType\":\"{2}\"}", uniqueFileId[index], FileName[index], "E"),
-                    options: {
-                        type: 'limbo',
-                        file: {
-                            name: FileName[index]
+                    var filepond_json = {
+                        source: String.format("{\"uniqueFileId\":\"{0}\",\"fileName\":\"{1}\",\"PageType\":\"{2}\"}", uniqueFileId[index], FileName[index], "E"),
+                        options: {
+                            type: 'limbo',
+                            file: {
+                                name: FileName[index]
+                            }
                         }
                     }
-                }
 
-                FILELIST.push(json);
-                FILEPOND_SOURCE.push(filepond_json)
+                    FILELIST.push(json);
+                    FILEPOND_SOURCE.push(filepond_json)
 
-            })
+                })
 
-            file = FILEPOND_SOURCE;
+                file = FILEPOND_SOURCE;
 
-            fnCreateFilePond(file);
+                fnCreateFilePond(file);
+
+            }
 
         }
 
@@ -195,15 +204,17 @@
 
     function fnSubmit() {
 
+        var LocationID = @LocationID;
+        var ProjectID = @p.ProjectID;
+
         var SoftwareID = Software.getValue();
         var InstallTypeID = InstallType.getValue();
         var UID = User.getValue();
         var Content = $("#Content").val();
-        var LocationID = @LocationID;
         var Version = $("#Version").val();
-        
         const formData = new FormData();
 
+        formData.append("ProjectID", ProjectID);
         formData.append("SoftwareID", SoftwareID)
         formData.append("InstallTypeID", InstallTypeID)
         formData.append("UID", UID)
@@ -218,31 +229,62 @@
 
         }
 
-        $.ajax({
-            type:'POST',
-            url: '/Project/WriteHistory',
-            contentType: false,
-            processData: false,
-            data: formData,
-            success: function(data){
+        if (@p.ProjectID > 0) { 
+            $.ajax({
+                type:'POST',
+                url: '/Project/EditHistory',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function(data){
+
+                    if (data == 1) {
+
+                        actionToast.alert("정상 처리되었습니다.")
+
+                        parent.location.reload();
+
+                    }
+                    else {
+
+                        actionToast.alert("처리중 오류가 발생했습니다.")
+
+                        return;
+                    }
+
+
+                }
+            })
+        }
+        else
+        {
+            $.ajax({
+                type:'POST',
+                url: '/Project/WriteHistory',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function(data){
             
-                if (data == 1) {
+                    if (data == 1) {
 
-                    actionToast.alert("정상 처리되었습니다.")
+                        actionToast.alert("정상 처리되었습니다.")
 
-                    parent.location.reload();
+                        parent.location.reload();
 
-                }
-                else {
+                    }
+                    else {
 
-                    actionToast.alert("처리중 오류가 발생했습니다.")
+                        actionToast.alert("처리중 오류가 발생했습니다.")
                     
-                    return;
+                        return;
+                    }
+
+
                 }
-
-
-            }
-        })
+            })
+        }
+        
 
     }
 </script>

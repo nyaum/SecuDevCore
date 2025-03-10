@@ -16,6 +16,7 @@ using System.Drawing.Printing;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using X.PagedList.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SecuDevCore.Controllers
 {
@@ -100,6 +101,8 @@ namespace SecuDevCore.Controllers
         public IActionResult IfWriteHistory(int LocationID, int ProjectID = 0)
         {
 
+            Project p = new Project();
+
             if (ProjectID > 0)
             {
                 Dictionary<string, object> param = new Dictionary<string, object>
@@ -113,14 +116,13 @@ namespace SecuDevCore.Controllers
 
                 if (ds.Tables[0].Rows.Count > 0)
                 {
-                    Project p = ds.Tables[0].Rows[0].ToObject<Project>();
-
-                    ViewBag.Project = p;
+                    p = ds.Tables[0].Rows[0].ToObject<Project>();
                 }
 
             }
 
             ViewBag.LocationID = LocationID;
+            ViewBag.Project = p;
 
             return View();
         }
@@ -363,6 +365,57 @@ namespace SecuDevCore.Controllers
             SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_DELETE", param);
 
             Rtn = result.ReturnValue;
+            return Rtn;
+        }
+
+        [HttpPost]
+        public int EditHistory(string SoftwareID, string InstallTypeID, int LocationID, string UID, string Content, string Version, string[] FilePath, int ProjectID)
+        {
+            int Rtn = -1;
+
+            try
+            {
+                string dbFilePath = "";
+                string FileName = "";
+
+                if (FilePath != null)
+                {
+                    for (int i = 0; i < FilePath.Length; i++)
+                    {
+                        if (i == 0)
+                        {
+                            dbFilePath = FilePath[i].Split(',')[0];
+                            FileName = FilePath[i].Split(',')[1];
+                        }
+                        else
+                        {
+                            dbFilePath += "|" + FilePath[i].Split(',')[0];
+                            FileName += "|" + FilePath[i].Split(',')[1];
+                        }
+                    }
+                }
+
+                Dictionary<string, object> param = new Dictionary<string, object>
+                {
+                    { "ProjectID", ProjectID },
+                    { "SoftwareID", SoftwareID },
+                    { "InstallTypeID", InstallTypeID },
+                    { "UID", UID },
+                    { "Content", Content },
+                    { "Version", Version },
+                    { "UUID", dbFilePath },
+                    { "FileName", FileName }
+                };
+
+                SQLResult result = ConnDB.DAL.ExecuteProcedure(ConnDB, "PROC_IF_PROJECT_EDIT", param);
+
+                Rtn = result.ReturnValue;
+
+            }
+            catch (Exception ex)
+            {
+                Rtn = -1;
+            }
 
             return Rtn;
         }
