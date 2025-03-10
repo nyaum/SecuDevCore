@@ -46,31 +46,35 @@
             var FileName = "@Html.Raw(b.FileName)".split("|")
             var uniqueFileId = "@Html.Raw(b.UUID)".split("|")
 
-            FileName.forEach(function (elem, index) {
+            if(FileName != "" && uniqueFileId != ""){
 
-                var json = {
-                    fileName: FileName[index],
-                    uniqueFileId: uniqueFileId[index]
-                }
+                FileName.forEach(function (elem, index) {
 
-                var filepond_json = {
-                    source: String.format("{\"uniqueFileId\":\"{0}\",\"fileName\":\"{1}\",\"PageType\":\"{2}\"}", uniqueFileId[index], FileName[index], "E"),
-                    options: {
-                        type: 'limbo',
-                        file: {
-                            name: FileName[index]
+                    var json = {
+                        fileName: FileName[index],
+                        uniqueFileId: uniqueFileId[index]
+                    }
+
+                    var filepond_json = {
+                        source: String.format("{\"uniqueFileId\":\"{0}\",\"fileName\":\"{1}\",\"PageType\":\"{2}\"}", uniqueFileId[index], FileName[index], "E"),
+                        options: {
+                            type: 'limbo',
+                            file: {
+                                name: FileName[index]
+                            }
                         }
                     }
-                }
 
-                FILELIST.push(json);
-                FILEPOND_SOURCE.push(filepond_json)
+                    FILELIST.push(json);
+                    FILEPOND_SOURCE.push(filepond_json)
 
-            })
+                })
 
-            file = FILEPOND_SOURCE;
+                file = FILEPOND_SOURCE;
 
-            fnCreateFilePond(file);
+                fnCreateFilePond(file);
+
+            }
 
         }
 
